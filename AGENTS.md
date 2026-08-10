@@ -67,3 +67,14 @@ meerkat/
 
 ## Project name origin
 "Meerkat" — chosen for the metaphor of meerkats living in social groups with lookouts that constantly watch for activity, fitting the real-time multi-channel inbox concept.
+
+## Coding Style & Commenting Rules
+When adding or modifying code, agents must strictly follow these commenting rules:
+1. **Headers / Main Code Blocks**: Use the comment symbol followed by ` ======== ` and ALL CAPS followed by ` =======`.
+   - Example (JS/TS): `// ======== DATABASE CONNECTION =======`
+   - Example (Python): `# ======== DATABASE CONNECTION =======`
+2. **Sub-code / Line-by-line**: Add comments for every logical line/step. These must be entirely in lowercase with no punctuation (no periods) at the end.
+   - Example (JS/TS): `// getting the info on db`
+   - Example (Python): `# getting the info on db`
+3. **Comment Content**: Comments must describe what the code does using short text only, while still providing the needed important details. Keep it concise but meaningful.
+4. **Plain English**: Use very simple, plain English. Avoid deep or overly technical jargon. The main goal is to make it easy for anyone to understand exactly what the code is doing.
