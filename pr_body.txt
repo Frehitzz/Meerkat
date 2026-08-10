@@ -1,0 +1,31 @@
+## Type
+Feature
+
+## Summary
+Integrates automated testing (`pytest`) and code formatting/linting (`ruff`) on the FastAPI backend. This ensures code quality and correctness before proceeding with more complex features.
+
+## Changes
+- Added `pytest`, `httpx`, and `ruff` to `requirements.txt`.
+- Created `test_main.py` with mock SQLite database tests for backend routes (root, ping, and database endpoints).
+- Created `pyproject.toml` to configure Ruff and ignore FastAPI-specific dependency injection warnings (`B008`).
+- Cleaned up imports and formatted codebase using `ruff check . --fix`.
+
+## Related
+N/A
+
+## Testing
+- [x] Tested locally
+- [x] No new errors/warnings in console
+- [x] Existing functionality still works (manual check)
+
+## What might break
+N/A (Testing setup is fully local and runs in-memory, so it does not affect any database deployments or cloud endpoints).
+
+## Screenshots (if UI change)
+N/A
+
+## Checklist
+- [x] No secrets/API keys committed
+- [x] `.env.example` updated if new env vars were added
+- [x] Code follows existing project structure/conventions
+- [x] Self-reviewed the diff before requesting merge
