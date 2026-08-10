@@ -2,13 +2,16 @@
 Feature
 
 ## Summary
-Integrates automated testing (`pytest`) and code formatting/linting (`ruff`) on the FastAPI backend. This ensures code quality and correctness before proceeding with more complex features.
+Integrates automated testing (`Vitest` + `React Testing Library` + `jsdom`) and code formatting (`Prettier`) on the React frontend. Also resolves conflicting ESLint rules.
 
 ## Changes
-- Added `pytest`, `httpx`, and `ruff` to `requirements.txt`.
-- Created `test_main.py` with mock SQLite database tests for backend routes (root, ping, and database endpoints).
-- Created `pyproject.toml` to configure Ruff and ignore FastAPI-specific dependency injection warnings (`B008`).
-- Cleaned up imports and formatted codebase using `ruff check . --fix`.
+- Installed `vitest`, `jsdom`, `@testing-library/react`, `@testing-library/jest-dom`, and `prettier` as devDependencies.
+- Configured Vitest inside `vite.config.js` to run in a `jsdom` browser-like environment.
+- Configured ESLint inside `eslint.config.js` to extend `eslint-config-prettier`, preventing styling rules conflicts.
+- Created `jsconfig.json` to configure the modern automatic JSX transform for editors and compile tools.
+- Created a global setup file `src/test/setup.js` to initialize DOM testing extensions and define React globally for tests.
+- Created `src/App.test.jsx` to test the App component's loading, success, and fail API states.
+- Cleaned and formatted the frontend codebase with `npm run format`.
 
 ## Related
 N/A
@@ -19,7 +22,7 @@ N/A
 - [x] Existing functionality still works (manual check)
 
 ## What might break
-N/A (Testing setup is fully local and runs in-memory, so it does not affect any database deployments or cloud endpoints).
+N/A (Testing configurations are only active in development/testing mode).
 
 ## Screenshots (if UI change)
 N/A
