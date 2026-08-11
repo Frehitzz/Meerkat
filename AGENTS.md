@@ -78,3 +78,12 @@ When adding or modifying code, agents must strictly follow these commenting rule
    - Example (Python): `# getting the info on db`
 3. **Comment Content**: Comments must describe what the code does using short text only, while still providing the needed important details. Keep it concise but meaningful.
 4. **Plain English**: Use very simple, plain English. Avoid deep or overly technical jargon. The main goal is to make it easy for anyone to understand exactly what the code is doing.
+
+## Pre-PR & CI Quality Checklist (Mandatory for AI Agents)
+Before creating any branch, committing code, or opening a Pull Request:
+1. **Branching**: Always create a dedicated feature branch (`feature/<name>`) instead of committing directly to `main`.
+2. **PR Template**: Always inspect and populate `.github/pull_request_template.md` when creating a PR description.
+3. **Backend Linter**: Always run `ruff check .` in `meerkat-backend` and fix all warnings/errors before pushing.
+4. **Backend Tests**: Always run `pytest` in `meerkat-backend` and ensure a 100% pass rate before pushing.
+5. **Frontend Linter & Tests**: If frontend code changed, run `npm run lint` and `npm run test:run` in `meerkat-frontend`.
+6. **Explicit Permission**: Do not automatically commit, push, or open a Pull Request. Always ask and wait for the user's explicit instruction before taking these actions.

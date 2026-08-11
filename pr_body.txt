@@ -2,27 +2,29 @@
 Feature
 
 ## Summary
-Integrates automated testing (`Vitest` + `React Testing Library` + `jsdom`) and code formatting (`Prettier`) on the React frontend. Also resolves conflicting ESLint rules.
+Completes Phase 3 and Phase 4 of the Meta App Integration by implementing Facebook Login for Business (OAuth flow) and incoming webhook ingestion. Includes UI updates and backend route handling. Additionally updates models.py to use enums for safer type checking, and adds an AI automation safety rule to AGENTS.md.
 
 ## Changes
-- Installed `vitest`, `jsdom`, `@testing-library/react`, `@testing-library/jest-dom`, and `prettier` as devDependencies.
-- Configured Vitest inside `vite.config.js` to run in a `jsdom` browser-like environment.
-- Configured ESLint inside `eslint.config.js` to extend `eslint-config-prettier`, preventing styling rules conflicts.
-- Created `jsconfig.json` to configure the modern automatic JSX transform for editors and compile tools.
-- Created a global setup file `src/test/setup.js` to initialize DOM testing extensions and define React globally for tests.
-- Created `src/App.test.jsx` to test the App component's loading, success, and fail API states.
-- Cleaned and formatted the frontend codebase with `npm run format`.
+- Created `meerkat-backend/routes/auth.py` for OAuth flow endpoints.
+- Created `meerkat-backend/routes/webhooks.py` for verification and webhook ingestion.
+- Registered new routers in `meerkat-backend/main.py`.
+- Updated `meerkat-backend/models.py` to add `Message` model and use `Platform` Enum for platform typing.
+- Added "Login with Facebook" button to React frontend in `meerkat-frontend/src/App.jsx`.
+- Added new rule to `AGENTS.md` preventing automatic git commits/PRs by AI agents without explicit user approval.
+- Added comprehensive unit tests for both authentication and webhook ingestion.
 
 ## Related
-N/A
+Phase 3 & Phase 4 Meta App Integration Plan
 
 ## Testing
 - [x] Tested locally
 - [x] No new errors/warnings in console
 - [x] Existing functionality still works (manual check)
+- [x] Backend Linter (ruff) passed
+- [x] Backend Tests (pytest) passed
 
 ## What might break
-N/A (Testing configurations are only active in development/testing mode).
+Minimal risk as these are new endpoints and frontend components.
 
 ## Screenshots (if UI change)
 N/A
