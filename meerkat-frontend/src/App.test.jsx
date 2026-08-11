@@ -60,4 +60,22 @@ describe("App Component", () => {
       ).toBeInTheDocument();
     });
   });
+
+  // test rendering of facebook login button
+  it("renders facebook login button", async () => {
+    // mock fetch to return a successful json reply
+    fetch.mockResolvedValue({
+      json: () => Promise.resolve({ message: "pong from FastAPI" }),
+    });
+
+    // render the app component
+    render(<App />);
+
+    // make sure facebook login button is present on screen
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", { name: "Login with Facebook for Business" }),
+      ).toBeInTheDocument();
+    });
+  });
 });

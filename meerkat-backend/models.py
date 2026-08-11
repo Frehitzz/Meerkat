@@ -1,4 +1,6 @@
-from sqlalchemy import Column, DateTime, Integer, String
+import enum
+
+from sqlalchemy import Column, DateTime, Enum, Integer, String
 from sqlalchemy.sql import func
 
 import database
@@ -33,4 +35,33 @@ class Seller(database.Base):
     # store the encrypted access token
     encrypted_access_token = Column(String)
     # save the exact date and time the seller signed up
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+# ======== PLATFORM ENUM =======
+# list the allowed platforms for messages
+class Platform(str, enum.Enum):
+    # platform for facebook messages
+    FACEBOOK = "facebook"
+    # platform for instagram messages
+    INSTAGRAM = "instagram"
+
+
+# ======== MESSAGE MODEL =======
+# create the blueprint for incoming social messages
+class Message(database.Base):
+    # set the name of the table in the database
+    __tablename__ = "messages"
+
+    # make a unique id number for each message
+    id = Column(Integer, primary_key=True, index=True)
+    # store platform type using our enum
+    platform = Column(Enum(Platform), index=True)
+    # store sender id from meta
+    sender_id = Column(String, index=True)
+    # store recipient page or account id
+    recipient_id = Column(String, index=True)
+    # store message text body
+    message_text = Column(String)
+    # save date and time message arrived
     created_at = Column(DateTime(timezone=True), server_default=func.now())

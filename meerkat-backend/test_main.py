@@ -126,3 +126,75 @@ def test_security_and_seller_model():
     assert security.decrypt_token(fetched.encrypted_access_token) == raw_token
     # close test session
     db.close()
+
+
+# test facebook oauth redirect endpoint
+def test_facebook_login_redirect():
+    # make get request to facebook auth endpoint without following redirects
+    response = client.get("/api/auth/facebook", follow_redirects=False)
+    # verify status code is 307 temporary redirect
+    assert response.status_code == 307
+    # verify redirect location points to facebook oauth dialog
+    assert "https://www.facebook.com/v19.0/dialog/oauth" in response.headers["location"]
+
+
+# test webhook verification handshake endpoint
+def test_webhook_verification():
+    import os
+    # set test verify token in environment
+    os.environ["META_WEBHOOK_VERIFY_TOKEN"] = "test_verify_token"
+
+    # test valid verification handshake
+    response = client.get("/api/webhook?hub.mode=subscribe&hub.verify_token=test_verify_token&hub.challenge=123456")
+    # verify status code is 200 ok
+    assert response.status_code == 200
+    # verify response content matches challenge string
+    assert response.text == "123456"
+
+    # test invalid verification handshake with wrong token
+    bad_response = client.get("/api/webhook?hub.mode=subscribe&hub.verify_token=wrong_token&hub.challenge=123456")
+    # verify status code is 403 forbidden
+    assert bad_response.status_code == 403
+
+
+# test webhook message ingestion endpoint
+def test_webhook_message_ingestion():
+    # create tables in test database
+    models.database.Base.metadata.create_all(bind=engine)
+
+    # sample webhook payload for facebook messenger
+    payload = {
+        "object": "page",
+        "entry": [
+            {
+                "id": "1000112233",
+                "messaging": [
+                    {
+                        "sender": {"id": "user_123"},
+                        "recipient": {"id": "page_456"},
+                        "message": {"text": "Hello Meerkat!"}
+                    }
+                ]
+            }
+        ]
+    }
+
+    # send post request to webhook endpoint
+    response = client.post("/api/webhook", json=payload)
+    # verify status code is 200 ok
+    assert response.status_code == 200
+    # verify response status is ok
+    assert response.json() == {"status": "ok"}
+
+    # open session to verify saved message in database
+    db = TestingSessionLocal()
+    # query message from database
+    msg = db.query(models.Message).filter_by(sender_id="user_123").first()
+    # verify message exists
+    assert msg is not None
+    # verify message text matches
+    assert msg.message_text == "Hello Meerkat!"
+    # verify platform is facebook
+    assert msg.platform == "facebook"
+    # close session
+    db.close()

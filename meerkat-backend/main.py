@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 import database
 import models
+from routes import auth, webhooks
 
 # ======== DATABASE SETUP =======
 # build the database tables if they are not there yet
@@ -20,6 +21,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ======== INCLUDE ROUTERS =======
+# connect auth router links to main app
+app.include_router(auth.router)
+# connect webhooks router links to main app
+app.include_router(webhooks.router)
 
 # ======== ROUTES =======
 # set up the main home page link
