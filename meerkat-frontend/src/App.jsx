@@ -3,8 +3,10 @@ import { useEffect, useState } from "react";
 // ======== HANDLERS =======
 // function to send seller to facebook login
 function handleFacebookLogin() {
+  // get backend url from env or use default localhost
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
   // redirect browser to backend facebook auth endpoint
-  window.location.href = "http://localhost:8000/api/auth/facebook";
+  window.location.href = `${baseUrl}/api/auth/facebook`;
 }
 
 // ======== APP COMPONENT =======
@@ -15,8 +17,10 @@ function App() {
 
   // fetch server status on component load
   useEffect(() => {
+    // get backend url from env or use default localhost
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
     // send request to backend ping link
-    fetch("http://localhost:8000/api/ping")
+    fetch(`${baseUrl}/api/ping`)
       // turn reply into json object
       .then((res) => res.json())
       // update state with backend reply text

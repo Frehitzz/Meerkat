@@ -1,30 +1,27 @@
 ## Type
-Feature
+Feature / Fix
 
 ## Summary
-Completes Phase 3 and Phase 4 of the Meta App Integration by implementing Facebook Login for Business (OAuth flow) and incoming webhook ingestion. Includes UI updates and backend route handling. Additionally updates models.py to use enums for safer type checking, and adds an AI automation safety rule to AGENTS.md.
+Completes Phase 5 testing fixes and prepares the project for Render deployment. The Facebook Login flow was updated to correctly use Meta's new `config_id` required for Business Login and explicitly requests `pages_manage_metadata` to allow automated Webhook subscriptions. 
 
 ## Changes
-- Created `meerkat-backend/routes/auth.py` for OAuth flow endpoints.
-- Created `meerkat-backend/routes/webhooks.py` for verification and webhook ingestion.
-- Registered new routers in `meerkat-backend/main.py`.
-- Updated `meerkat-backend/models.py` to add `Message` model and use `Platform` Enum for platform typing.
-- Added "Login with Facebook" button to React frontend in `meerkat-frontend/src/App.jsx`.
-- Added new rule to `AGENTS.md` preventing automatic git commits/PRs by AI agents without explicit user approval.
-- Added comprehensive unit tests for both authentication and webhook ingestion.
+- Updated `meerkat-backend/routes/auth.py` to use `config_id` instead of raw scopes.
+- Added logic in `auth.py` to auto-subscribe the seller's Facebook Pages to the webhook upon successful login.
+- Replaced hardcoded localhost URL in `meerkat-frontend/src/App.jsx` with `VITE_API_BASE_URL` environment variable.
+- Added `.env.example` to the frontend directory.
+- Updated `meerkat-backend/.env.example` to include `META_REDIRECT_URI`.
 
 ## Related
-Phase 3 & Phase 4 Meta App Integration Plan
+Phase 5 of Meta App Integration Plan
 
 ## Testing
 - [x] Tested locally
 - [x] No new errors/warnings in console
 - [x] Existing functionality still works (manual check)
-- [x] Backend Linter (ruff) passed
-- [x] Backend Tests (pytest) passed
+- [x] Webhook verified working against live Meta Graph API 
 
 ## What might break
-Minimal risk as these are new endpoints and frontend components.
+Minimal risk. All endpoints updated safely.
 
 ## Screenshots (if UI change)
 N/A

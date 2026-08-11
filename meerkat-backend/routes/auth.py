@@ -21,12 +21,12 @@ def facebook_login():
     app_id = os.getenv("META_APP_ID", "")
     # set the callback link back to our server
     redirect_uri = os.getenv("META_REDIRECT_URI", "http://localhost:8000/api/auth/facebook/callback")
-    # set permissions requested from seller
-    scope = "pages_messaging,instagram_manage_messages,pages_show_list,pages_read_engagement,instagram_basic"
-    # build full facebook login url
+    # use the config_id created in the meta dashboard for business login permissions
+    config_id = os.getenv("META_CONFIG_ID", "1535297491677462")
+    # build full facebook login url using config_id instead of scope
     fb_url = (
         f"https://www.facebook.com/v19.0/dialog/oauth?"
-        f"client_id={app_id}&redirect_uri={redirect_uri}&scope={scope}&response_type=code"
+        f"client_id={app_id}&redirect_uri={redirect_uri}&config_id={config_id}&response_type=code"
     )
     # send seller to facebook login
     return RedirectResponse(url=fb_url)
@@ -80,6 +80,30 @@ async def facebook_callback(code: str, db: Session = Depends(database.get_db)):
         fb_user_id = profile_data.get("id", "unknown_id")
         # get seller name
         seller_name = profile_data.get("name", "Unknown Seller")
+
+        # ======== SUBSCRIBE PAGES TO WEBHOOKS =======
+        # fetch all facebook pages owned by the seller
+        accounts_url = f"https://graph.facebook.com/v19.0/me/accounts?access_token={access_token}"
+        # send request to get pages list
+        accounts_response = await client.get(accounts_url)
+        # parse json pages reply
+        accounts_data = accounts_response.json()
+
+        # loop through all pages the seller owns
+        for page in accounts_data.get("data", []):
+            # get the unique page id
+            page_id = page.get("id")
+            # get the specific access token for this page
+            page_token = page.get("access_token")
+            # prepare the subscription link
+            subscribe_url = f"https://graph.facebook.com/v19.0/{page_id}/subscribed_apps"
+            # set the fields we want to subscribe to
+            subscribe_params = {
+                "subscribed_fields": "messages",
+                "access_token": page_token
+            }
+            # send post request to tell meta to forward messages for this page
+            await client.post(subscribe_url, data=subscribe_params)
 
     # encrypt access token safely using security module
     encrypted_token = security.encrypt_token(access_token)
