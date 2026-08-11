@@ -17,7 +17,10 @@ app = FastAPI()
 # allow the web app to talk to the frontend safely
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+        "http://localhost:5173",
+        "https://meerkat-app.onrender.com"
+    ],
     allow_methods=["*"],
     allow_headers=["*"],
 )
