@@ -83,3 +83,46 @@ def test_database_endpoints():
     assert "items" in get_response.json()
     # make sure the list is not empty
     assert len(get_response.json()["items"]) > 0
+
+
+# test encryption and seller database model
+def test_security_and_seller_model():
+    import security
+    # sample token string
+    raw_token = "EAAB1234567890abcdef"
+    # encrypt the token
+    encrypted = security.encrypt_token(raw_token)
+    # verify it is encrypted and not equal to raw token
+    assert encrypted != raw_token
+    # decrypt the token back
+    decrypted = security.decrypt_token(encrypted)
+    # verify decrypted token matches original
+    assert decrypted == raw_token
+
+    # create tables in test database
+    models.database.Base.metadata.create_all(bind=engine)
+    # open session
+    db = TestingSessionLocal()
+    # create new seller
+    seller = models.Seller(
+        facebook_user_id="123456789",
+        name="Test Seller",
+        encrypted_access_token=encrypted
+    )
+    # add seller to session
+    db.add(seller)
+    # commit seller to database
+    db.commit()
+    # refresh seller instance
+    db.refresh(seller)
+
+    # query seller from database
+    fetched = db.query(models.Seller).filter_by(facebook_user_id="123456789").first()
+    # verify seller exists
+    assert fetched is not None
+    # verify seller name matches
+    assert fetched.name == "Test Seller"
+    # verify decrypted token matches original
+    assert security.decrypt_token(fetched.encrypted_access_token) == raw_token
+    # close test session
+    db.close()
