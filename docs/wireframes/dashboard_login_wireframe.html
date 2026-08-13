@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<!-- ======== HTML DOCUMENT HEADER ======== -->
+<!-- setting up html structure -->
+<html lang="en">
+<!-- ======== HEAD SECTION ======== -->
+<!-- setting up metadata and styles -->
+<head>
+  <!-- setting character set to utf-8 -->
+  <meta charset="UTF-8">
+  <!-- setting viewport for responsive view -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- setting document title -->
+  <title>Meerkat — Dashboard & Login Wireframe</title>
+  <!-- importing google font inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- ======== STYLESHEET ======== -->
+  <!-- CSS styling for wireframe view -->
+  <style>
+    /* importing chango font for brand display */
+    @import url('https://fonts.googleapis.com/css2?family=Chango&display=swap');
+
+    /* ======== DESIGN TOKENS ======= */
+    /* defining root css variables based on design system */
+    :root {
+      /* font definitions */
+      --font-main: 'Inter', sans-serif;
+      --font-brand: 'Chango', cursive;
+
+      /* base canvas colors */
+      --color-bg: #1A1513;
+      --color-surface: #2F2A29;
+      --color-surface-hover: #453D3C;
+      --color-border: #453D3C;
+
+      /* Meerkat brand palette */
+      --color-primary-hover: #F0982F;
+      --color-primary-light: #FBB653;
+      --color-orange-dark: #B15B0D;
+      --color-brown: #4C240B;
+      --color-near-black: #1A1513;
+      --color-cream: #FAEFDD;
+      --color-warm-beige: #D1B69F;
+
+      /* typography colors */
+      --color-text-main: #FAEFDD;
+      --color-text-muted: #D1B69F;
+      
+      /* brand accent colors */
+      --color-primary: #D4791B;
+      --color-fb: #1877f2;
+      --color-ig: #e1306c;
+      --color-ai: #D4791B;
+      --color-ai-text: #FBB653;
+      --color-success: #5FAF63;
+      --color-warning: #F0982F;
+      
+      /* setting layout metrics */
+      --sidebar-width: 260px;
+      --border-radius: 10px;
+    }
+
+    /* ======== GLOBAL STYLES ======= */
+    /* resetting default margins and padding */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* styling main body */
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--color-bg);
+      color: var(--color-text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ======== TOOLBAR STYLES ======= */
+    /* styling top wireframe control bar */
+    .wireframe-bar {
+      background-color: #120E0C;
+      border-bottom: 1px solid var(--color-border);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 100;
+    }
+
+    /* styling wireframe title tag */
+    .wireframe-title {
+      font-family: var(--font-brand);
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--color-text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* styling status badge */
+    .wireframe-badge {
+      background-color: rgba(212, 121, 27, 0.2);
+      color: var(--color-primary-light);
+      padding: 2px 8px;
+      border-radius: 9999px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    /* styling tab buttons container */
+    .wireframe-tabs {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* styling individual view button */
+    .view-btn {
+      background-color: var(--color-surface);
+      color: var(--color-text-muted);
+      border: 1px solid var(--color-border);
+      padding: 6px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    /* styling active state for view button */
+    .view-btn.active {
+      background-color: var(--color-primary);
+      color: var(--color-cream);
+      border-color: var(--color-primary);
+    }
+
+    /* styling hover state for view button */
+    .view-btn:hover:not(.active) {
+      background-color: var(--color-surface-hover);
+      color: var(--color-text-main);
+    }
+
+    /* ======== MAIN CONTAINER ======= */
+    /* styling main view wrapper */
+    .app-viewport {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* hiding non active view panels */
+    .view-panel {
+      display: none;
+      width: 100%;
+      height: 100%;
+      flex: 1;
+    }
+
+    /* showing active view panel */
+    .view-panel.active {
+      display: flex;
+    }
+
+    /* ======== LOGIN VIEW STYLES ======= */
+    /* styling full login wrapper */
+    .login-container {
+      display: flex;
+      width: 100%;
+      min-height: calc(100vh - 57px);
+    }
+
+    /* styling left hero banner area */
+    .login-hero {
+      flex: 1;
+      background: linear-gradient(135deg, #4C240B 0%, #1A1513 100%);
+      padding: 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-right: 1px solid var(--color-border);
+    }
+
+    /* styling hero brand header */
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-brand);
+      font-size: 24px;
+      font-weight: 400;
+      color: var(--color-cream);
+    }
+
+    /* styling logo icon container */
+    .brand-icon {
+      width: 40px;
+      height: 40px;
+      background-color: var(--color-primary);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-brand);
+      font-weight: 400;
+      color: white;
+    }
+
+    /* styling main hero copy */
+    .hero-content h1 {
+      font-size: 40px;
+      line-height: 1.2;
+      margin-bottom: 16px;
+      font-weight: 700;
+      color: var(--color-cream);
+    }
+
+    /* styling hero description text */
+    .hero-content p {
+      font-size: 16px;
+      color: var(--color-text-muted);
+      line-height: 1.6;
+      max-width: 480px;
+      margin-bottom: 32px;
+    }
+
+    /* styling feature highlights grid */
+    .feature-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      max-width: 480px;
+    }
+
+    /* styling individual feature item */
+    .feature-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      background-color: rgba(250, 239, 221, 0.04);
+      padding: 14px;
+      border-radius: 8px;
+      border: 1px solid rgba(250, 239, 221, 0.08);
+    }
+
+    /* styling feature icon badge */
+    .feature-badge {
+      padding: 6px;
+      border-radius: 6px;
+      font-size: 16px;
+      background-color: rgba(212, 121, 27, 0.15);
+      color: var(--color-primary-light);
+    }
+
+    /* styling feature text content */
+    .feature-text h4 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 2px;
+      color: var(--color-cream);
+    }
+
+    /* styling feature subtext */
+    .feature-text p {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      margin-bottom: 0;
+    }
+
+    /* styling right form area */
+    .login-form-area {
+      width: 480px;
+      background-color: var(--color-bg);
+      padding: 60px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    /* styling form card wrapper */
+    .login-card {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* styling login title block */
+    .login-header h2 {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--color-cream);
+    }
+
+    /* styling login subtitle */
+    .login-header p {
+      font-size: 14px;
+      color: var(--color-text-muted);
+    }
+
+    /* styling facebook login button */
+    .btn-fb-login {
+      background-color: var(--color-fb);
+      color: var(--color-cream);
+      border: none;
+      border-radius: 8px;
+      padding: 14px 20px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      transition: opacity 0.2s ease;
+      width: 100%;
+      box-shadow: 0 4px 12px rgba(24, 119, 242, 0.3);
+    }
+
+    /* styling facebook login button hover */
+    .btn-fb-login:hover {
+      opacity: 0.92;
+    }
+
+    /* styling permission info note */
+    .login-info-box {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 14px;
+      font-size: 12px;
+      color: var(--color-text-muted);
+      line-height: 1.5;
+    }
+
+    /* styling info title line */
+    .login-info-title {
+      font-weight: 600;
+      color: var(--color-text-main);
+      margin-bottom: 4px;
+    }
+
+    /* ======== DASHBOARD VIEW STYLES ======= */
+    /* styling dashboard container grid */
+    .dashboard-layout {
+      display: flex;
+      width: 100%;
+      height: calc(100vh - 57px);
+      overflow: hidden;
+    }
+
+    /* styling left navigation sidebar */
+    .sidebar {
+      width: var(--sidebar-width);
+      background-color: #241C19;
+      border-right: 1px solid var(--color-border);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px 16px;
+    }
+
+    /* styling sidebar brand tag */
+    .sidebar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-brand);
+      font-size: 18px;
+      font-weight: 400;
+      margin-bottom: 24px;
+      padding-left: 8px;
+      color: var(--color-cream);
+    }
+
+    /* styling nav menu section */
+    .nav-section-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+      margin-bottom: 10px;
+      padding-left: 8px;
+    }
+
+    /* styling navigation menu list */
+    .nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      margin-bottom: 24px;
+    }
+
+    /* styling nav item link */
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    /* styling active state for nav item */
+    .nav-item.active {
+      background-color: var(--color-primary);
+      color: var(--color-cream);
+    }
+
+    /* styling hover state for nav item */
+    .nav-item:hover:not(.active) {
+      background-color: var(--color-surface);
+      color: var(--color-text-main);
+    }
+
+    /* styling connected channels card in sidebar */
+    .connected-pages-card {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: auto;
+    }
+
+    /* styling page list title */
+    .connected-pages-title {
+      font-size: 12px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* styling connected page item row */
+    .page-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      padding: 4px 0;
+    }
+
+    /* styling page platform icon */
+    .badge-icon-fb {
+      color: var(--color-fb);
+      font-weight: bold;
+    }
+
+    .badge-icon-ig {
+      color: var(--color-ig);
+      font-weight: bold;
+    }
+
+    /* styling user profile footer block */
+    .user-footer {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-top: 16px;
+      border-top: 1px solid var(--color-border);
+      margin-top: 16px;
+    }
+
+    /* styling user avatar */
+    .avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background-color: var(--color-surface-hover);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--color-cream);
+    }
+
+    /* styling user name labels */
+    .user-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .user-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-cream);
+    }
+
+    .user-role {
+      font-size: 11px;
+      color: var(--color-text-muted);
+    }
+
+    /* styling main dashboard workspace */
+    .main-workspace {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background-color: var(--color-bg);
+      overflow-y: auto;
+    }
+
+    /* styling workspace header */
+    .workspace-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: #1A1513;
+    }
+
+    /* styling header title */
+    .header-title h3 {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--color-cream);
+    }
+
+    .header-title p {
+      font-size: 12px;
+      color: var(--color-text-muted);
+    }
+
+    /* styling header toolbar buttons */
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* styling filter pills container */
+    .filter-pills {
+      display: flex;
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      padding: 3px;
+    }
+
+    /* styling individual filter pill */
+    .pill-btn {
+      padding: 5px 12px;
+      border-radius: 4px;
+      border: none;
+      background: none;
+      color: var(--color-text-muted);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    /* styling active state for filter pill */
+    .pill-btn.active {
+      background-color: var(--color-surface-hover);
+      color: var(--color-text-main);
+    }
+
+    /* styling main inbox split view */
+    .inbox-grid {
+      display: flex;
+      flex: 1;
+      height: calc(100% - 69px);
+    }
+
+    /* styling conversation list pane */
+    .conversation-pane {
+      width: 360px;
+      border-right: 1px solid var(--color-border);
+      display: flex;
+      flex-direction: column;
+      background-color: #1A1513;
+    }
+
+    /* styling search bar area */
+    .search-box {
+      padding: 12px;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .search-input {
+      width: 100%;
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      padding: 8px 12px;
+      color: var(--color-cream);
+      font-size: 12px;
+      outline: none;
+    }
+
+    /* styling message list */
+    .msg-list {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    /* styling single message item card */
+    .msg-item {
+      padding: 14px;
+      border-bottom: 1px solid var(--color-border);
+      cursor: pointer;
+      transition: background 0.15s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .msg-item:hover {
+      background-color: var(--color-surface);
+    }
+
+    .msg-item.active {
+      background-color: var(--color-surface-hover);
+      border-left: 3px solid var(--color-primary);
+    }
+
+    /* styling msg top row */
+    .msg-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .msg-sender {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-cream);
+    }
+
+    .msg-time {
+      font-size: 11px;
+      color: var(--color-text-muted);
+    }
+
+    /* styling msg snippet */
+    .msg-snippet {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* styling platform tags */
+    .msg-tags {
+      display: flex;
+      gap: 6px;
+    }
+
+    .tag-fb {
+      background-color: rgba(24, 119, 242, 0.15);
+      color: #60a5fa;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    .tag-ig {
+      background-color: rgba(225, 48, 108, 0.15);
+      color: #f472b6;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    /* styling detail workspace panel */
+    .detail-pane {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background-color: #241C19;
+    }
+
+    /* styling active conversation header */
+    .chat-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background-color: var(--color-surface);
+    }
+
+    /* styling chat user details */
+    .chat-user-details {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* styling messaging list view */
+    .chat-body {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* styling bubble messages */
+    .bubble {
+      max-width: 70%;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .bubble-inbound {
+      background-color: var(--color-surface);
+      align-self: flex-start;
+      border-bottom-left-radius: 2px;
+      color: var(--color-cream);
+    }
+
+    .bubble-read-only-banner {
+      background-color: rgba(240, 152, 47, 0.1);
+      border: 1px dashed var(--color-warning);
+      color: var(--color-warning);
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      text-align: center;
+      margin-top: auto;
+    }
+
+    /* styling side widget column */
+    .widget-pane {
+      width: 300px;
+      border-left: 1px solid var(--color-border);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background-color: #1A1513;
+    }
+
+    /* styling widget card container */
+    .widget-card {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 14px;
+    }
+
+    .widget-card h4 {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--color-cream);
+    }
+
+    /* styling metric number row */
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      padding: 4px 0;
+    }
+
+    .stat-number {
+      font-weight: 700;
+      color: var(--color-primary-light);
+    }
+
+    /* styling ai strategy widget card */
+    .ai-card {
+      border-color: rgba(212, 121, 27, 0.4);
+      background: linear-gradient(180deg, rgba(212, 121, 27, 0.08) 0%, rgba(47, 42, 41, 1) 100%);
+    }
+
+    .ai-card h4 {
+      color: var(--color-ai-text);
+    }
+
+    /* ======== ANNOTATION VIEW STYLES ======= */
+    /* styling documentation specs panel */
+    .specs-container {
+      padding: 40px;
+      max-width: 1000px;
+      margin: 0 auto;
+      overflow-y: auto;
+    }
+
+    .specs-title {
+      font-family: var(--font-brand);
+      font-size: 28px;
+      font-weight: 400;
+      margin-bottom: 16px;
+      color: var(--color-primary);
+    }
+
+    .specs-section {
+      background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .specs-section h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--color-cream);
+    }
+
+    .specs-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-top: 10px;
+    }
+
+    .specs-table th, .specs-table td {
+      border: 1px solid var(--color-border);
+      padding: 10px;
+      text-align: left;
+    }
+
+    .specs-table th {
+      background-color: var(--color-surface-hover);
+      color: var(--color-cream);
+    }
+  </style>
+</head>
+
+<!-- ======== BODY SECTION ======== -->
+<!-- main app layout body -->
+<body>
+
+  <!-- ======== TOOLBAR NAVIGATION ======== -->
+  <!-- top bar for wireframe toggles -->
+  <div class="wireframe-bar">
+    <!-- showing project name tag -->
+    <div class="wireframe-title">
+      <strong>MEERKAT WIREFRAME</strong>
+      <span class="wireframe-badge">Phase 6 UI Specs</span>
+    </div>
+
+    <!-- view mode selector buttons -->
+    <div class="wireframe-tabs">
+      <button class="view-btn active" onclick="switchView('login')">1. Login View</button>
+      <button class="view-btn" onclick="switchView('dashboard')">2. Dashboard View</button>
+      <button class="view-btn" onclick="switchView('specs')">3. Architecture & Specs</button>
+    </div>
+  </div>
+
+  <!-- ======== APPS VIEWPORT ======== -->
+  <!-- container holding all view panels -->
+  <div class="app-viewport">
+
+    <!-- ======== PANEL 1: LOGIN VIEW ======== -->
+    <!-- login screen wireframe panel -->
+    <div id="panel-login" class="view-panel active">
+      <!-- login main container -->
+      <div class="login-container">
+        <!-- left side hero area -->
+        <div class="login-hero">
+          <!-- header logo -->
+          <div class="brand-logo">
+            <div class="brand-icon">M</div>
+            <span>Meerkat</span>
+          </div>
+
+          <!-- main promo copy -->
+          <div class="hero-content">
+            <h1>Social Commerce Command Center</h1>
+            <p>Unified Facebook & Instagram messaging, automated sales insights, and AI-driven growth strategies built specifically for PH sellers.</p>
+
+            <!-- key features list -->
+            <div class="feature-list">
+              <!-- feature 1 -->
+              <div class="feature-item">
+                <div class="feature-badge">📥</div>
+                <div class="feature-text">
+                  <h4>Unified Inbox</h4>
+                  <p>Read all customer DMs from Facebook Pages & Instagram Business in one clean dashboard.</p>
+                </div>
+              </div>
+              <!-- feature 2 -->
+              <div class="feature-item">
+                <div class="feature-badge">📊</div>
+                <div class="feature-text">
+                  <h4>Sales Analytics</h4>
+                  <p>Track page reach, link clicks, profile views, and daily conversation volume.</p>
+                </div>
+              </div>
+              <!-- feature 3 -->
+              <div class="feature-item">
+                <div class="feature-badge">🤖</div>
+                <div class="feature-text">
+                  <h4>AI Strategy (BYOK)</h4>
+                  <p>Plug in your own OpenAI, Anthropic, or Gemini key to generate weekly sales tips.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- footer copyright notice -->
+          <div style="font-size: 12px; color: var(--color-text-muted);">
+            © 2026 Meerkat App. All rights reserved.
+          </div>
+        </div>
+
+        <!-- right side login form area -->
+        <div class="login-form-area">
+          <!-- login action card -->
+          <div class="login-card">
+            <div class="login-header">
+              <h2>Seller Login</h2>
+              <p>Connect your official Facebook Business Account to manage your shop messages.</p>
+            </div>
+
+            <!-- facebook oauth login button -->
+            <button class="btn-fb-login" onclick="switchView('dashboard')">
+              <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+              </svg>
+              Login with Facebook for Business
+            </button>
+
+            <!-- permissions information box -->
+            <div class="login-info-box">
+              <div class="login-info-title">🔒 Permissions Granted Upon Login:</div>
+              <ul style="margin-left: 16px; margin-top: 6px;">
+                <li>Facebook Pages list & messaging permissions</li>
+                <li>Linked Instagram Business messaging</li>
+                <li>Page insights & analytics reading</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== PANEL 2: DASHBOARD VIEW ======== -->
+    <!-- dashboard screen wireframe panel -->
+    <div id="panel-dashboard" class="view-panel">
+      <!-- dashboard main grid wrapper -->
+      <div class="dashboard-layout">
+        <!-- sidebar column -->
+        <div class="sidebar">
+          <!-- top brand header -->
+          <div>
+            <div class="sidebar-brand">
+              <div class="brand-icon" style="width: 28px; height: 28px; font-size: 14px;">M</div>
+              <span>Meerkat</span>
+            </div>
+
+            <!-- main navigation menu -->
+            <div class="nav-section-label">Menu</div>
+            <ul class="nav-list">
+              <li class="nav-item active">
+                <span>📥</span> Unified Inbox
+              </li>
+              <li class="nav-item">
+                <span>📊</span> Sales Insights
+              </li>
+              <li class="nav-item">
+                <span>💡</span> AI Strategy
+              </li>
+              <li class="nav-item">
+                <span>⚙️</span> Settings (BYOK)
+              </li>
+            </ul>
+          </div>
+
+          <!-- connected channels section -->
+          <div>
+            <div class="connected-pages-card">
+              <div class="connected-pages-title">
+                <span>Connected Channels</span>
+                <span style="color: var(--color-success);">● Live</span>
+              </div>
+              <!-- facebook page -->
+              <div class="page-row">
+                <span class="badge-icon-fb">FB</span>
+                <span>Manila Craft Shop</span>
+              </div>
+              <!-- instagram account -->
+              <div class="page-row">
+                <span class="badge-icon-ig">IG</span>
+                <span>@manilacrafts</span>
+              </div>
+            </div>
+
+            <!-- logged in user footer -->
+            <div class="user-footer">
+              <div class="avatar">F</div>
+              <div class="user-info">
+                <span class="user-name">Fritz (Seller)</span>
+                <span class="user-role">Connected to Meta</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- main content area -->
+        <div class="main-workspace">
+          <!-- top workspace header -->
+          <div class="workspace-header">
+            <div class="header-title">
+              <h3>Unified Inbox</h3>
+              <p>Phase 6 MVP — Read-only customer messages</p>
+            </div>
+
+            <!-- platform filter pills -->
+            <div class="header-actions">
+              <div class="filter-pills">
+                <button class="pill-btn active" onclick="filterMessages('all', this)">All</button>
+                <button class="pill-btn" onclick="filterMessages('facebook', this)">Facebook</button>
+                <button class="pill-btn" onclick="filterMessages('instagram', this)">Instagram</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- inbox split pane -->
+          <div class="inbox-grid">
+            <!-- message list left pane -->
+            <div class="conversation-pane">
+              <!-- search input -->
+              <div class="search-box">
+                <input type="text" class="search-input" placeholder="Search conversations...">
+              </div>
+
+              <!-- message list items -->
+              <div class="msg-list" id="msg-list-container">
+                <!-- item 1: facebook -->
+                <div class="msg-item active" data-platform="facebook">
+                  <div class="msg-header">
+                    <span class="msg-sender">Maria Santos</span>
+                    <span class="msg-time">10:42 AM</span>
+                  </div>
+                  <div class="msg-snippet">Hi! Available pa ba itong leather wallet?</div>
+                  <div class="msg-tags">
+                    <span class="tag-fb">Facebook</span>
+                  </div>
+                </div>
+
+                <!-- item 2: instagram -->
+                <div class="msg-item" data-platform="instagram">
+                  <div class="msg-header">
+                    <span class="msg-sender">@juan_delacruz</span>
+                    <span class="msg-time">9:15 AM</span>
+                  </div>
+                  <div class="msg-snippet">How much is the shipping fee to Cebu?</div>
+                  <div class="msg-tags">
+                    <span class="tag-ig">Instagram</span>
+                  </div>
+                </div>
+
+                <!-- item 3: facebook -->
+                <div class="msg-item" data-platform="facebook">
+                  <div class="msg-header">
+                    <span class="msg-sender">Elena Reyes</span>
+                    <span class="msg-time">Yesterday</span>
+                  </div>
+                  <div class="msg-snippet">Thank you! Received the items safely.</div>
+                  <div class="msg-tags">
+                    <span class="tag-fb">Facebook</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- detail pane center -->
+            <div class="detail-pane">
+              <!-- active conversation top header -->
+              <div class="chat-header">
+                <div class="chat-user-details">
+                  <div class="avatar" style="background-color: var(--color-fb);">M</div>
+                  <div>
+                    <strong style="font-size: 14px;">Maria Santos</strong>
+                    <div style="font-size: 11px; color: var(--color-text-muted);">via Facebook Page: Manila Craft Shop</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- chat bubbles container -->
+              <div class="chat-body">
+                <div class="bubble bubble-inbound">
+                  Hi! Available pa ba itong leather wallet? Magkano po pag custom initials?
+                </div>
+
+                <!-- phase 6 read-only notification banner -->
+                <div class="bubble-read-only-banner">
+                  ℹ️ Phase 6 MVP Notice: Dashboard inbox is currently <strong>read-only</strong>. To reply to customer inquiries, please open Facebook Business Suite / Meta Inbox.
+                </div>
+              </div>
+            </div>
+
+            <!-- right side overview widgets -->
+            <div class="widget-pane">
+              <!-- sales tracking widget preview -->
+              <div class="widget-card">
+                <h4>
+                  <span>Sales Overview</span>
+                  <span style="font-size: 10px; color: var(--color-text-muted);">Phase 8</span>
+                </h4>
+                <div class="stat-row">
+                  <span>Weekly Reach</span>
+                  <span class="stat-number">1,240</span>
+                </div>
+                <div class="stat-row">
+                  <span>Link Clicks</span>
+                  <span class="stat-number">85</span>
+                </div>
+                <div class="stat-row">
+                  <span>Conversations</span>
+                  <span class="stat-number">24</span>
+                </div>
+              </div>
+
+              <!-- ai strategy widget preview -->
+              <div class="widget-card ai-card">
+                <h4>
+                  <span>AI Strategy Tip</span>
+                  <span style="font-size: 10px; color: var(--color-ai-text);">Phase 9</span>
+                </h4>
+                <p style="font-size: 12px; line-height: 1.5; color: var(--color-cream); margin-top: 6px;">
+                  "Your Tuesday posts generate 3x more inquiries than weekends. Schedule your next leather wallet drop for Tuesday at 7:00 PM!"
+                </p>
+                <div style="font-size: 10px; color: var(--color-text-muted); margin-top: 8px;">
+                  Powered by BYOK LLM Key (Gemini / OpenAI)
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======== PANEL 3: ARCHITECTURE SPECS ======== -->
+    <!-- specs documentation view panel -->
+    <div id="panel-specs" class="view-panel">
+      <!-- specs wrapper container -->
+      <div class="specs-container">
+        <h2 class="specs-title">Phase 6: Dashboard UI Technical Specification</h2>
+        
+        <!-- section 1: components list -->
+        <div class="specs-section">
+          <h3>Phase 6 Component Checklist & Mapping</h3>
+          <table class="specs-table">
+            <thead>
+              <tr>
+                <th>Component</th>
+                <th>Layer</th>
+                <th>Wireframe Element</th>
+                <th>Backend API Endpoint</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Login Screen</td>
+                <td>Frontend</td>
+                <td>FB Login Button, Hero Card</td>
+                <td><code>GET /api/auth/facebook</code></td>
+              </tr>
+              <tr>
+                <td>Session Auth</td>
+                <td>Backend</td>
+                <td>Token verification</td>
+                <td><code>GET /api/me</code></td>
+              </tr>
+              <tr>
+                <td>Sidebar Profile</td>
+                <td>Frontend</td>
+                <td>Connected pages list & avatar</td>
+                <td><code>GET /api/me</code></td>
+              </tr>
+              <tr>
+                <td>Unified Message List</td>
+                <td>Frontend/Backend</td>
+                <td>Inbox list with FB/IG badges</td>
+                <td><code>GET /api/messages?platform=all|facebook|instagram</code></td>
+              </tr>
+              <tr>
+                <td>Live Updates (Phase 7)</td>
+                <td>Frontend/Backend</td>
+                <td>Real-time message list push</td>
+                <td><code>GET /api/messages/stream (SSE)</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- section 2: design goals -->
+        <div class="specs-section">
+          <h3>Design & UX Decisions</h3>
+          <ul style="margin-left: 20px; line-height: 1.6; font-size: 13px;">
+            <li><strong>Single OAuth Flow:</strong> Login with Facebook for Business covers both FB Page & connected IG Business account.</li>
+            <li><strong>Platform Tags:</strong> High-visibility badges differentiate Facebook vs Instagram inquiries instantly.</li>
+            <li><strong>Read-Only Banner:</strong> Clear warning during Phase 6 that replies must be sent via Meta Business Suite until Phase 10+.</li>
+            <li><strong>Widget Placeholders:</strong> Prepared UI grid slots for Phase 8 Sales Analytics & Phase 9 AI Strategy.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ======== JAVASCRIPT LOGIC ======== -->
+  <!-- handling interactive view switching -->
+  <script>
+    // ======== VIEW SWITCHER =======
+    // function to switch active panel view
+    function switchView(viewName) {
+      // get all view panels
+      const panels = document.querySelectorAll('.view-panel');
+      // hide all panels
+      panels.forEach(p => p.classList.remove('active'));
+
+      // get all tab buttons
+      const buttons = document.querySelectorAll('.view-btn');
+      // remove active class from all buttons
+      buttons.forEach(b => b.classList.remove('active'));
+
+      // show target panel
+      const targetPanel = document.getElementById('panel-' + viewName);
+      if (targetPanel) {
+        targetPanel.classList.add('active');
+      }
+
+      // highlight active button
+      const activeBtn = Array.from(buttons).find(b => b.textContent.toLowerCase().includes(viewName));
+      if (activeBtn) {
+        activeBtn.classList.add('active');
+      }
+    }
+
+    // ======== MESSAGE FILTER =======
+    // function to filter messages by platform in wireframe demo
+    function filterMessages(platform, btnElement) {
+      // update pill button highlight
+      const pills = document.querySelectorAll('.pill-btn');
+      pills.forEach(p => p.classList.remove('active'));
+      btnElement.classList.add('active');
+
+      // filter message items
+      const items = document.querySelectorAll('#msg-list-container .msg-item');
+      items.forEach(item => {
+        const itemPlatform = item.getAttribute('data-platform');
+        if (platform === 'all' || itemPlatform === platform) {
+          item.style.display = 'flex';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>

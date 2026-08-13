@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<!-- ======== HTML DOCUMENT HEADER ======== -->
+<!-- setting up html document structure -->
+<html lang="en">
+<!-- ======== HEAD SECTION ======== -->
+<!-- metadata fonts and design system CSS -->
+<head>
+  <!-- setting character set to utf-8 -->
+  <meta charset="UTF-8">
+  <!-- setting responsive viewport scale -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- setting document title -->
+  <title>Meerkat — Social Commerce Command Center UI</title>
+  <!-- importing google font inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- ======== STYLESHEET ======== -->
+  <!-- styling all showcase elements and components -->
+  <style>
+    /* importing chango font for brand display */
+    @import url('https://fonts.googleapis.com/css2?family=Chango&display=swap');
+
+    /* ======== DESIGN TOKENS ======= */
+    /* defining global CSS variables */
+    :root {
+      /* font definitions */
+      --font-main: 'Inter', sans-serif;
+      --font-brand: 'Chango', cursive;
+
+      /* base canvas colors */
+      --color-bg-base: #1A1513;
+      --color-bg-sidebar: #241C19;
+      --color-surface-card: #2F2A29;
+      --color-surface-hover: #453D3C;
+      --color-border: #453D3C;
+
+      /* Meerkat brand palette */
+      --color-primary-hover: #F0982F;
+      --color-primary-light: #FBB653;
+      --color-orange-dark: #B15B0D;
+      --color-brown: #4C240B;
+      --color-near-black: #1A1513;
+      --color-cream: #FAEFDD;
+      --color-warm-beige: #D1B69F;
+
+      /* typography colors */
+      --color-text-main: #FAEFDD;
+      --color-text-muted: #D1B69F;
+      
+      /* brand accent colors */
+      --color-primary: #D4791B;
+      --color-fb-brand: #1877f2;
+      --color-ig-brand: #e1306c;
+      --color-ai-purple: #D4791B;
+      --color-ai-text: #FBB653;
+      --color-success: #5FAF63;
+      --color-warning: #F0982F;
+    }
+
+    /* ======== GLOBAL STYLES ======= */
+    /* resetting default margins */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* styling body canvas */
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--color-bg-base);
+      color: var(--color-text-main);
+      line-height: 1.5;
+      padding: 40px 20px;
+    }
+
+    /* styling layout container */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* styling page header */
+    .header {
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: 24px;
+      margin-bottom: 40px;
+    }
+
+    /* styling header title */
+    .header h1 {
+      font-family: var(--font-brand);
+      font-size: 28px;
+      font-weight: 400;
+      color: #FAEFDD;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* styling logo icon badge */
+    .logo-badge {
+      background-color: var(--color-primary);
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-brand);
+      font-size: 20px;
+      color: white;
+    }
+
+    /* styling subhead copy */
+    .header p {
+      font-size: 14px;
+      color: var(--color-text-muted);
+      margin-top: 8px;
+    }
+
+    /* styling section container */
+    .section {
+      background-color: var(--color-bg-sidebar);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 40px;
+    }
+
+    /* styling section header title */
+    .section-title {
+      font-family: var(--font-brand);
+      font-size: 20px;
+      font-weight: 400;
+      color: var(--color-primary);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* ======== COLOR SWATCHES ======= */
+    /* styling color swatch grid */
+    .swatch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    /* styling single swatch item */
+    .swatch-card {
+      background-color: var(--color-surface-card);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    /* styling color block preview */
+    .swatch-color {
+      height: 80px;
+      width: 100%;
+    }
+
+    /* styling swatch meta info */
+    .swatch-info {
+      padding: 12px;
+    }
+
+    /* styling swatch title */
+    .swatch-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-text-main);
+    }
+
+    /* styling swatch code tag */
+    .swatch-code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--color-primary);
+      margin-top: 2px;
+      display: block;
+    }
+
+    /* styling swatch usage description */
+    .swatch-desc {
+      font-size: 11px;
+      color: var(--color-text-muted);
+      margin-top: 4px;
+    }
+
+    /* ======== TYPOGRAPHY SHOWCASE ======= */
+    /* styling typography row */
+    .type-row {
+      background-color: var(--color-bg-base);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    /* styling typography label tag */
+    .type-meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      display: flex;
+      gap: 12px;
+    }
+
+    /* styling meta pill */
+    .meta-tag {
+      background-color: var(--color-surface-card);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--color-primary);
+    }
+
+    /* ======== COMPONENT SHOWCASE ======= */
+    /* styling component preview container */
+    .component-card {
+      background-color: var(--color-bg-base);
+      border: 1px solid var(--color-border);
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    /* styling component label */
+    .component-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    /* styling facebook login button */
+    .btn-fb-login {
+      background-color: var(--color-fb-brand);
+      color: #FAEFDD;
+      border: none;
+      border-radius: 8px;
+      padding: 14px 24px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 4px 12px rgba(24, 119, 242, 0.3);
+    }
+
+    /* styling channel tags */
+    .tag-fb {
+      background-color: rgba(24, 119, 242, 0.15);
+      color: #60a5fa;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      border: 1px solid rgba(24, 119, 242, 0.3);
+    }
+
+    .tag-ig {
+      background-color: rgba(225, 48, 108, 0.15);
+      color: #f472b6;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      border: 1px solid rgba(225, 48, 108, 0.3);
+    }
+
+    /* styling active inbox row demo */
+    .inbox-item-demo {
+      background-color: var(--color-surface-hover);
+      border-left: 3px solid var(--color-primary);
+      padding: 14px;
+      border-radius: 0 6px 6px 0;
+      max-width: 360px;
+    }
+
+    /* styling read-only notice banner */
+    .notice-banner {
+      background-color: rgba(245, 158, 11, 0.1);
+      border: 1px dashed var(--color-warning);
+      color: var(--color-warning);
+      padding: 12px 16px;
+      border-radius: 6px;
+      font-size: 12px;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    /* styling ai strategy widget */
+    .ai-widget {
+      background: linear-gradient(180deg, rgba(212, 121, 27, 0.08) 0%, rgba(30, 41, 59, 1) 100%);
+      border: 1px solid rgba(212, 121, 27, 0.4);
+      padding: 16px;
+      border-radius: 8px;
+      max-width: 320px;
+    }
+  </style>
+</head>
+
+<!-- ======== BODY SECTION ======== -->
+<!-- main showcase content -->
+<body>
+  <div class="container">
+
+    <!-- ======== PAGE HEADER ======== -->
+    <!-- header banner section -->
+    <div class="header">
+      <h1>
+        <span class="logo-badge">M</span>
+        Meerkat UI Design System
+      </h1>
+      <p>Official Visual Style Guide & Live Component Library for Meerkat Social Commerce Command Center.</p>
+    </div>
+
+    <!-- ======== SECTION 1: COLOR PALETTE ======== -->
+    <!-- color swatches section -->
+    <div class="section">
+      <h2 class="section-title">1. Color Palette & Visual Tokens</h2>
+      
+      <!-- swatch grid -->
+      <div class="swatch-grid">
+
+        <!-- base canvas swatch -->
+        <div class="swatch-card">
+          <div class="swatch-color" style="background-color: #1A1513; border-bottom: 1px solid #453D3C;"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Base Canvas</div>
+            <span class="swatch-code">#1A1513</span>
+            <div class="swatch-desc">Main app page background</div>
+          </div>
+        </div>
+
+        <!-- sidebar swatch -->
+        <div class="swatch-card">
+          <div class="swatch-color" style="background-color: #241C19; border-bottom: 1px solid #453D3C;"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Sidebar Surface</div>
+            <span class="swatch-code">#241C19</span>
+            <div class="swatch-desc">Left navigation sidebar</div>
+          </div>
+        </div>
+
+        <!-- card surface swatch -->
+        <div class="swatch-card">
+          <div class="swatch-color" style="background-color: #2F2A29;"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Card Surface</div>
+            <span class="swatch-code">#2F2A29</span>
+            <div class="swatch-desc">Modules, containers, cards</div>
+          </div>
+        </div>
+
+        <!-- hover surface swatch -->
+        <div class="swatch-card">
+          <div class="swatch-color" style="background-color: #453D3C;"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Hover / Selection</div>
+            <span class="swatch-code">#453D3C</span>
+            <div class="swatch-desc">Active item background</div>
+          </div>
+        </div>
+
+        <!-- primary blue swatch -->
+        <div class="swatch-card">
+          <div class="swatch-color" style="background-color: #D4791B;"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Meerkat Amber</div>
+            <span class="swatch-code">#D4791B</span>
+            <div class="swatch-desc">Primary brand accent</div>
+          </div>
+        </div>
+
+        <!-- facebook blue swatch -->
+        <div class="swatch-card">
+          <div class="swatch-color" style="background-color: #1877f2;"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Facebook Blue</div>
+            <span class="swatch-code">#1877F2</span>
+            <div class="swatch-desc">Official FB Channel badge/button</div>
+          </div>
+        </div>
+
+        <!-- instagram pink swatch -->
+        <div class="swatch-card">
+          <div class="swatch-color" style="background-color: #e1306c;"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">Instagram Pink</div>
+            <span class="swatch-code">#E1306C</span>
+            <div class="swatch-desc">Official IG Channel badge</div>
+          </div>
+        </div>
+
+        <!-- ai purple swatch -->
+        <div class="swatch-card">
+          <div class="swatch-color" style="background-color: #D4791B;"></div>
+          <div class="swatch-info">
+            <div class="swatch-name">AI Purple</div>
+            <span class="swatch-code">#D4791B</span>
+            <div class="swatch-desc">AI Strategy feature card</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ======== SECTION 2: TYPOGRAPHY SHOWCASE ======== -->
+    <!-- typography hierarchy section -->
+    <div class="section">
+      <h2 class="section-title">2. Typography Hierarchy (Live Previews)</h2>
+
+      <!-- type item 0: Brand Header (Chango) -->
+      <div class="type-row">
+        <div class="type-meta">
+          <span>Role: Brand Logo & Header</span>
+          <span class="meta-tag">Chango</span>
+          <span class="meta-tag">Display Accent</span>
+        </div>
+        <div style="font-family: var(--font-brand); font-size: 28px; font-weight: 400; line-height: 1.2; color: #FAEFDD;">
+          Meerkat Social Commerce
+        </div>
+      </div>
+
+      <!-- type item 1: Display -->
+      <div class="type-row">
+        <div class="type-meta">
+          <span>Role: Display / Hero</span>
+          <span class="meta-tag">40px / 2.5rem</span>
+          <span class="meta-tag">Weight 700 (Bold)</span>
+        </div>
+        <div style="font-size: 40px; font-weight: 700; line-height: 1.2; letter-spacing: -0.02em; color: #FAEFDD;">
+          Social Commerce Command Center
+        </div>
+      </div>
+
+      <!-- type item 2: Page Title -->
+      <div class="type-row">
+        <div class="type-meta">
+          <span>Role: Page Title (H2)</span>
+          <span class="meta-tag">24px / 1.5rem</span>
+          <span class="meta-tag">Weight 700 (Bold)</span>
+        </div>
+        <div style="font-size: 24px; font-weight: 700; line-height: 1.3; color: #FAEFDD;">
+          Seller Account Login & Settings
+        </div>
+      </div>
+
+      <!-- type item 3: Section Title -->
+      <div class="type-row">
+        <div class="type-meta">
+          <span>Role: Section Header (H3)</span>
+          <span class="meta-tag">18px / 1.125rem</span>
+          <span class="meta-tag">Weight 700 (Bold)</span>
+        </div>
+        <div style="font-size: 18px; font-weight: 700; line-height: 1.4; color: #FAEFDD;">
+          Unified Customer Message Inbox
+        </div>
+      </div>
+
+      <!-- type item 4: Card Title -->
+      <div class="type-row">
+        <div class="type-meta">
+          <span>Role: Card Title / Sender (H4)</span>
+          <span class="meta-tag">14px / 0.875rem</span>
+          <span class="meta-tag">Weight 600 (SemiBold)</span>
+        </div>
+        <div style="font-size: 14px; font-weight: 600; line-height: 1.4; color: #FAEFDD;">
+          Maria Santos (Manila Craft Shop)
+        </div>
+      </div>
+
+      <!-- type item 5: Body Standard -->
+      <div class="type-row">
+        <div class="type-meta">
+          <span>Role: Body Standard</span>
+          <span class="meta-tag">14px / 0.875rem</span>
+          <span class="meta-tag">Weight 400 (Regular)</span>
+        </div>
+        <div style="font-size: 14px; font-weight: 400; line-height: 1.5; color: #FAEFDD;">
+          Hi! Available pa ba itong leather wallet? Magkano po pag custom initials?
+        </div>
+      </div>
+
+      <!-- type item 6: Body Small -->
+      <div class="type-row">
+        <div class="type-meta">
+          <span>Role: Body Small / Muted</span>
+          <span class="meta-tag">12px / 0.75rem</span>
+          <span class="meta-tag">Weight 400 (Regular)</span>
+        </div>
+        <div style="font-size: 12px; font-weight: 400; line-height: 1.4; color: #D1B69F;">
+          Read all customer DMs from Facebook Pages & Instagram Business in one clean dashboard.
+        </div>
+      </div>
+
+      <!-- type item 7: Timestamp -->
+      <div class="type-row">
+        <div class="type-meta">
+          <span>Role: Timestamp / Badge</span>
+          <span class="meta-tag">11px / 0.6875rem</span>
+          <span class="meta-tag">Weight 600 (SemiBold)</span>
+        </div>
+        <div style="font-size: 11px; font-weight: 600; color: #D1B69F; letter-spacing: 0.02em;">
+          OCT 24, 2026 • 10:42 AM
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ======== SECTION 3: COMPONENT GALLERY ======== -->
+    <!-- rendered ui components section -->
+    <div class="section">
+      <h2 class="section-title">3. Rendered Component Library</h2>
+
+      <!-- component 1: facebook button -->
+      <div class="component-card">
+        <div class="component-label">A. OAuth Login Action Button</div>
+        <button class="btn-fb-login">
+          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+          Login with Facebook for Business
+        </button>
+      </div>
+
+      <!-- component 2: platform badges -->
+      <div class="component-card">
+        <div class="component-label">B. Platform Channel Badges</div>
+        <div style="display: flex; gap: 12px;">
+          <span class="tag-fb">Facebook Page</span>
+          <span class="tag-ig">Instagram Business</span>
+        </div>
+      </div>
+
+      <!-- component 3: inbox row -->
+      <div class="component-card">
+        <div class="component-label">C. Selected Message Row in Inbox</div>
+        <div class="inbox-item-demo">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+            <strong style="color: #FAEFDD; font-size: 13px;">Maria Santos</strong>
+            <span style="color: #D1B69F; font-size: 11px;">10:42 AM</span>
+          </div>
+          <div style="color: #D1B69F; font-size: 12px; margin-bottom: 8px;">
+            Hi! Available pa ba itong leather wallet?
+          </div>
+          <span style="background-color: rgba(24, 119, 242, 0.15); color: #60a5fa; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600;">Facebook</span>
+        </div>
+      </div>
+
+      <!-- component 4: read-only banner -->
+      <div class="component-card">
+        <div class="component-label">D. Phase 6 Read-Only Notice Banner</div>
+        <div class="notice-banner">
+          ℹ️ Phase 6 MVP Notice: Dashboard inbox is currently <strong>read-only</strong>. To reply to customer inquiries, please open Facebook Business Suite / Meta Inbox.
+        </div>
+      </div>
+
+      <!-- component 5: ai strategy widget -->
+      <div class="component-card">
+        <div class="component-label">E. AI Sales Strategy Card (Phase 9)</div>
+        <div class="ai-widget">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <strong style="color: #FBB653; font-size: 13px;">AI Strategy Tip</strong>
+            <span style="background-color: rgba(212, 121, 27, 0.2); color: #FBB653; padding: 2px 6px; border-radius: 999px; font-size: 10px; font-weight: 600;">Phase 9</span>
+          </div>
+          <p style="color: #FAEFDD; font-size: 12px; line-height: 1.5; margin-bottom: 10px;">
+            "Your Tuesday posts generate 3x more inquiries than weekends. Schedule your next leather wallet drop for Tuesday at 7:00 PM!"
+          </p>
+          <div style="font-size: 10px; color: #D1B69F;">
+            Powered by BYOK LLM Key (Gemini / OpenAI)
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</body>
+</html>
