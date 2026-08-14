@@ -1,6 +1,9 @@
+import os
+
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
 
 import database
 import main
@@ -9,9 +12,6 @@ import models
 # ======== TEST DATABASE SETUP =======
 # set up a temporary in-memory database for testing
 TEST_DATABASE_URL = "sqlite:///:memory:"
-
-# import staticpool to keep sqlite connection alive
-from sqlalchemy.pool import StaticPool
 
 # build the database engine for tests using staticpool
 engine = create_engine(
@@ -84,7 +84,6 @@ def test_database_endpoints():
     # make sure the list is not empty
     assert len(get_response.json()["items"]) > 0
 
-
 # test encryption and seller database model
 def test_security_and_seller_model():
     import security
@@ -107,7 +106,7 @@ def test_security_and_seller_model():
     seller = models.Seller(
         facebook_user_id="123456789",
         name="Test Seller",
-        encrypted_access_token=encrypted
+        encrypted_access_token=encrypted,
     )
     # add seller to session
     db.add(seller)
@@ -127,7 +126,6 @@ def test_security_and_seller_model():
     # close test session
     db.close()
 
-
 # test facebook oauth redirect endpoint
 def test_facebook_login_redirect():
     # make get request to facebook auth endpoint without following redirects
@@ -137,10 +135,17 @@ def test_facebook_login_redirect():
     # verify redirect location points to facebook oauth dialog
     assert "https://www.facebook.com/v19.0/dialog/oauth" in response.headers["location"]
 
+# test facebook callback error redirect
+def test_facebook_callback_error():
+    # test callback with error parameter
+    response = client.get("/api/auth/facebook/callback?error=access_denied", follow_redirects=False)
+    # verify status code is 307 redirect
+    assert response.status_code == 307
+    # verify redirect location points to frontend with error query parameter
+    assert "error=auth_failed" in response.headers["location"]
 
 # test webhook verification handshake endpoint
 def test_webhook_verification():
-    import os
     # set test verify token in environment
     os.environ["META_WEBHOOK_VERIFY_TOKEN"] = "test_verify_token"
 
@@ -155,7 +160,6 @@ def test_webhook_verification():
     bad_response = client.get("/api/webhook?hub.mode=subscribe&hub.verify_token=wrong_token&hub.challenge=123456")
     # verify status code is 403 forbidden
     assert bad_response.status_code == 403
-
 
 # test webhook message ingestion endpoint
 def test_webhook_message_ingestion():
@@ -172,11 +176,11 @@ def test_webhook_message_ingestion():
                     {
                         "sender": {"id": "user_123"},
                         "recipient": {"id": "page_456"},
-                        "message": {"text": "Hello Meerkat!"}
+                        "message": {"text": "Hello Meerkat!"},
                     }
-                ]
+                ],
             }
-        ]
+        ],
     }
 
     # send post request to webhook endpoint
@@ -198,3 +202,47 @@ def test_webhook_message_ingestion():
     assert msg.platform == "facebook"
     # close session
     db.close()
+
+# test messages list endpoint
+def test_get_messages_endpoint():
+    # create tables in test database
+    models.database.Base.metadata.create_all(bind=engine)
+    # open session
+    db = TestingSessionLocal()
+    # insert sample facebook message
+    msg_fb = models.Message(
+        platform=models.Platform.FACEBOOK,
+        sender_id="fb_user_1",
+        recipient_id="page_1",
+        message_text="Facebook test inquiry",
+    )
+    # insert sample instagram message
+    msg_ig = models.Message(
+        platform=models.Platform.INSTAGRAM,
+        sender_id="ig_user_1",
+        recipient_id="page_1",
+        message_text="Instagram test inquiry",
+    )
+    db.add(msg_fb)
+    db.add(msg_ig)
+    db.commit()
+    db.close()
+
+    # get all messages
+    res_all = client.get("/api/messages")
+    assert res_all.status_code == 200
+    data_all = res_all.json()
+    assert data_all["status"] == "success"
+    assert data_all["count"] >= 2
+
+    # get filtered facebook messages
+    res_fb = client.get("/api/messages?platform=facebook")
+    assert res_fb.status_code == 200
+    data_fb = res_fb.json()
+    assert all(m["platform"] == "facebook" for m in data_fb["messages"])
+
+    # get filtered instagram messages
+    res_ig = client.get("/api/messages?platform=instagram")
+    assert res_ig.status_code == 200
+    data_ig = res_ig.json()
+    assert all(m["platform"] == "instagram" for m in data_ig["messages"])

@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 import database
 import models
-from routes import auth, webhooks
+from routes import auth, messages, webhooks
 
 # ======== DATABASE SETUP =======
 # build the database tables if they are not there yet
@@ -19,8 +19,9 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
-        "https://meerkat-app.onrender.com"
+        "https://meerkat-app.onrender.com",
     ],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -30,6 +31,8 @@ app.add_middleware(
 app.include_router(auth.router)
 # connect webhooks router links to main app
 app.include_router(webhooks.router)
+# connect messages router links to main app
+app.include_router(messages.router)
 
 # ======== ROUTES =======
 # set up the main home page link
