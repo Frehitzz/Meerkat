@@ -17,47 +17,47 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 
   <!-- ======== STYLESHEET ======== -->
-  <!-- CSS styling for wireframe view -->
+  <!-- css styling for wireframe view -->
   <style>
     /* importing chango font for brand display */
     @import url('https://fonts.googleapis.com/css2?family=Chango&display=swap');
 
     /* ======== DESIGN TOKENS ======= */
-    /* defining root css variables based on design system */
+    /* defining root css variables for black and white with common accents */
     :root {
       /* font definitions */
-      --font-main: 'Inter', sans-serif;
+      --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
       --font-brand: 'Chango', cursive;
 
-      /* base canvas colors */
-      --color-bg: #1A1513;
-      --color-surface: #2F2A29;
-      --color-surface-hover: #453D3C;
-      --color-border: #453D3C;
-
-      /* Meerkat brand palette */
-      --color-primary-hover: #F0982F;
-      --color-primary-light: #FBB653;
-      --color-orange-dark: #B15B0D;
-      --color-brown: #4C240B;
-      --color-near-black: #1A1513;
-      --color-cream: #FAEFDD;
-      --color-warm-beige: #D1B69F;
-
-      /* typography colors */
-      --color-text-main: #FAEFDD;
-      --color-text-muted: #D1B69F;
+      /* main black and white palette */
+      --color-black: #000000;
+      --color-bg: #09090b;
+      --color-surface: #141417;
+      --color-surface-hover: #202025;
+      --color-surface-card: #18181b;
+      --color-border: #27272a;
+      --color-border-subtle: #1f1f23;
+      --color-white: #ffffff;
       
-      /* brand accent colors */
-      --color-primary: #D4791B;
+      /* typography colors */
+      --color-text-main: #f4f4f5;
+      --color-text-muted: #a1a1aa;
+      --color-text-dim: #71717a;
+
+      /* interactive primary button and highlights */
+      --color-primary: #ffffff;
+      --color-primary-text: #000000;
+      --color-primary-hover: #e4e4e7;
+      
+      /* supporting common colors */
       --color-fb: #1877f2;
       --color-ig: #e1306c;
-      --color-ai: #D4791B;
-      --color-ai-text: #FBB653;
-      --color-success: #5FAF63;
-      --color-warning: #F0982F;
-      
-      /* setting layout metrics */
+      --color-success: #22c55e;
+      --color-warning: #f59e0b;
+      --color-info: #3b82f6;
+      --color-ai: #a855f7;
+
+      /* layout metrics */
       --sidebar-width: 260px;
       --border-radius: 10px;
     }
@@ -72,18 +72,19 @@
 
     /* styling main body */
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: var(--font-main);
       background-color: var(--color-bg);
       color: var(--color-text-main);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      -webkit-font-smoothing: antialiased;
     }
 
     /* ======== TOOLBAR STYLES ======= */
     /* styling top wireframe control bar */
     .wireframe-bar {
-      background-color: #120E0C;
+      background-color: var(--color-black);
       border-bottom: 1px solid var(--color-border);
       padding: 12px 24px;
       display: flex;
@@ -94,23 +95,25 @@
 
     /* styling wireframe title tag */
     .wireframe-title {
-      font-family: var(--font-brand);
-      font-size: 14px;
-      font-weight: 400;
-      color: var(--color-text-muted);
+      font-family: var(--font-main);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--color-text-main);
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 10px;
+      letter-spacing: 0.02em;
     }
 
     /* styling status badge */
     .wireframe-badge {
-      background-color: rgba(212, 121, 27, 0.2);
-      color: var(--color-primary-light);
+      background-color: rgba(255, 255, 255, 0.1);
+      color: var(--color-text-main);
+      border: 1px solid var(--color-border);
       padding: 2px 8px;
       border-radius: 9999px;
-      font-size: 12px;
-      font-weight: 600;
+      font-size: 11px;
+      font-weight: 500;
     }
 
     /* styling tab buttons container */
@@ -129,20 +132,22 @@
       cursor: pointer;
       font-size: 13px;
       font-weight: 500;
-      transition: all 0.2s ease;
+      transition: all 0.15s ease;
     }
 
     /* styling active state for view button */
     .view-btn.active {
-      background-color: var(--color-primary);
-      color: var(--color-cream);
-      border-color: var(--color-primary);
+      background-color: var(--color-white);
+      color: var(--color-black);
+      border-color: var(--color-white);
+      font-weight: 600;
     }
 
     /* styling hover state for view button */
     .view-btn:hover:not(.active) {
       background-color: var(--color-surface-hover);
       color: var(--color-text-main);
+      border-color: #3f3f46;
     }
 
     /* ======== MAIN CONTAINER ======= */
@@ -178,7 +183,7 @@
     /* styling left hero banner area */
     .login-hero {
       flex: 1;
-      background: linear-gradient(135deg, #4C240B 0%, #1A1513 100%);
+      background: linear-gradient(145deg, #141417 0%, #09090b 100%);
       padding: 60px;
       display: flex;
       flex-direction: column;
@@ -194,35 +199,38 @@
       font-family: var(--font-brand);
       font-size: 24px;
       font-weight: 400;
-      color: var(--color-cream);
+      color: var(--color-white);
+      letter-spacing: 0.02em;
     }
 
     /* styling logo icon container */
     .brand-icon {
       width: 40px;
       height: 40px;
-      background-color: var(--color-primary);
-      border-radius: 10px;
+      background-color: var(--color-white);
+      border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-family: var(--font-brand);
       font-weight: 400;
-      color: white;
+      color: var(--color-black);
+      font-size: 18px;
     }
 
     /* styling main hero copy */
     .hero-content h1 {
-      font-size: 40px;
+      font-size: 38px;
       line-height: 1.2;
       margin-bottom: 16px;
       font-weight: 700;
-      color: var(--color-cream);
+      color: var(--color-white);
+      letter-spacing: -0.02em;
     }
 
     /* styling hero description text */
     .hero-content p {
-      font-size: 16px;
+      font-size: 15px;
       color: var(--color-text-muted);
       line-height: 1.6;
       max-width: 480px;
@@ -233,7 +241,7 @@
     .feature-list {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 14px;
       max-width: 480px;
     }
 
@@ -241,20 +249,26 @@
     .feature-item {
       display: flex;
       align-items: flex-start;
-      gap: 12px;
-      background-color: rgba(250, 239, 221, 0.04);
-      padding: 14px;
+      gap: 14px;
+      background-color: var(--color-surface);
+      padding: 14px 16px;
       border-radius: 8px;
-      border: 1px solid rgba(250, 239, 221, 0.08);
+      border: 1px solid var(--color-border);
     }
 
     /* styling feature icon badge */
     .feature-badge {
-      padding: 6px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       border-radius: 6px;
-      font-size: 16px;
-      background-color: rgba(212, 121, 27, 0.15);
-      color: var(--color-primary-light);
+      font-size: 15px;
+      background-color: var(--color-surface-hover);
+      border: 1px solid var(--color-border);
+      color: var(--color-white);
+      flex-shrink: 0;
     }
 
     /* styling feature text content */
@@ -262,7 +276,7 @@
       font-size: 14px;
       font-weight: 600;
       margin-bottom: 2px;
-      color: var(--color-cream);
+      color: var(--color-white);
     }
 
     /* styling feature subtext */
@@ -270,6 +284,7 @@
       font-size: 12px;
       color: var(--color-text-muted);
       margin-bottom: 0;
+      line-height: 1.4;
     }
 
     /* styling right form area */
@@ -294,32 +309,33 @@
       font-size: 24px;
       font-weight: 700;
       margin-bottom: 8px;
-      color: var(--color-cream);
+      color: var(--color-white);
+      letter-spacing: -0.01em;
     }
 
     /* styling login subtitle */
     .login-header p {
-      font-size: 14px;
+      font-size: 13px;
       color: var(--color-text-muted);
+      line-height: 1.5;
     }
 
     /* styling facebook login button */
     .btn-fb-login {
       background-color: var(--color-fb);
-      color: var(--color-cream);
+      color: var(--color-white);
       border: none;
       border-radius: 8px;
-      padding: 14px 20px;
-      font-size: 15px;
+      padding: 13px 20px;
+      font-size: 14px;
       font-weight: 600;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-      transition: opacity 0.2s ease;
+      gap: 10px;
+      transition: opacity 0.15s ease;
       width: 100%;
-      box-shadow: 0 4px 12px rgba(24, 119, 242, 0.3);
     }
 
     /* styling facebook login button hover */
@@ -342,7 +358,7 @@
     .login-info-title {
       font-weight: 600;
       color: var(--color-text-main);
-      margin-bottom: 4px;
+      margin-bottom: 6px;
     }
 
     /* ======== DASHBOARD VIEW STYLES ======= */
@@ -357,7 +373,7 @@
     /* styling left navigation sidebar */
     .sidebar {
       width: var(--sidebar-width);
-      background-color: #241C19;
+      background-color: var(--color-surface);
       border-right: 1px solid var(--color-border);
       display: flex;
       flex-direction: column;
@@ -375,17 +391,17 @@
       font-weight: 400;
       margin-bottom: 24px;
       padding-left: 8px;
-      color: var(--color-cream);
+      color: var(--color-white);
     }
 
     /* styling nav menu section */
     .nav-section-label {
       font-size: 11px;
-      font-weight: 700;
+      font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--color-text-muted);
-      margin-bottom: 10px;
+      letter-spacing: 0.06em;
+      color: var(--color-text-dim);
+      margin-bottom: 8px;
       padding-left: 8px;
     }
 
@@ -403,7 +419,7 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 10px 12px;
+      padding: 9px 12px;
       border-radius: 6px;
       font-size: 13px;
       font-weight: 500;
@@ -414,19 +430,20 @@
 
     /* styling active state for nav item */
     .nav-item.active {
-      background-color: var(--color-primary);
-      color: var(--color-cream);
+      background-color: var(--color-white);
+      color: var(--color-black);
+      font-weight: 600;
     }
 
     /* styling hover state for nav item */
     .nav-item:hover:not(.active) {
-      background-color: var(--color-surface);
+      background-color: var(--color-surface-hover);
       color: var(--color-text-main);
     }
 
     /* styling connected channels card in sidebar */
     .connected-pages-card {
-      background-color: var(--color-surface);
+      background-color: var(--color-surface-card);
       border: 1px solid var(--color-border);
       border-radius: 8px;
       padding: 12px;
@@ -441,6 +458,24 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      color: var(--color-text-main);
+    }
+
+    /* styling live dot */
+    .live-indicator {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--color-success);
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: var(--color-success);
     }
 
     /* styling connected page item row */
@@ -450,17 +485,26 @@
       gap: 8px;
       font-size: 12px;
       padding: 4px 0;
+      color: var(--color-text-muted);
     }
 
     /* styling page platform icon */
     .badge-icon-fb {
       color: var(--color-fb);
-      font-weight: bold;
+      font-weight: 700;
+      font-size: 11px;
+      background-color: rgba(24, 119, 242, 0.12);
+      padding: 2px 5px;
+      border-radius: 4px;
     }
 
     .badge-icon-ig {
       color: var(--color-ig);
-      font-weight: bold;
+      font-weight: 700;
+      font-size: 11px;
+      background-color: rgba(225, 48, 108, 0.12);
+      padding: 2px 5px;
+      border-radius: 4px;
     }
 
     /* styling user profile footer block */
@@ -468,23 +512,24 @@
       display: flex;
       align-items: center;
       gap: 10px;
-      padding-top: 16px;
+      padding-top: 14px;
       border-top: 1px solid var(--color-border);
-      margin-top: 16px;
+      margin-top: 14px;
     }
 
     /* styling user avatar */
     .avatar {
-      width: 34px;
-      height: 34px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       background-color: var(--color-surface-hover);
+      border: 1px solid var(--color-border);
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 600;
-      font-size: 13px;
-      color: var(--color-cream);
+      font-size: 12px;
+      color: var(--color-white);
     }
 
     /* styling user name labels */
@@ -496,7 +541,7 @@
     .user-name {
       font-size: 13px;
       font-weight: 600;
-      color: var(--color-cream);
+      color: var(--color-white);
     }
 
     .user-role {
@@ -520,19 +565,21 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background-color: #1A1513;
+      background-color: var(--color-surface);
     }
 
     /* styling header title */
     .header-title h3 {
-      font-size: 18px;
+      font-size: 17px;
       font-weight: 700;
-      color: var(--color-cream);
+      color: var(--color-white);
+      letter-spacing: -0.01em;
     }
 
     .header-title p {
       font-size: 12px;
       color: var(--color-text-muted);
+      margin-top: 2px;
     }
 
     /* styling header toolbar buttons */
@@ -545,10 +592,11 @@
     /* styling filter pills container */
     .filter-pills {
       display: flex;
-      background-color: var(--color-surface);
+      background-color: var(--color-surface-card);
       border: 1px solid var(--color-border);
       border-radius: 6px;
       padding: 3px;
+      gap: 2px;
     }
 
     /* styling individual filter pill */
@@ -561,12 +609,14 @@
       font-size: 12px;
       font-weight: 500;
       cursor: pointer;
+      transition: all 0.15s ease;
     }
 
     /* styling active state for filter pill */
     .pill-btn.active {
-      background-color: var(--color-surface-hover);
-      color: var(--color-text-main);
+      background-color: var(--color-white);
+      color: var(--color-black);
+      font-weight: 600;
     }
 
     /* styling main inbox split view */
@@ -582,7 +632,7 @@
       border-right: 1px solid var(--color-border);
       display: flex;
       flex-direction: column;
-      background-color: #1A1513;
+      background-color: var(--color-surface);
     }
 
     /* styling search bar area */
@@ -593,13 +643,22 @@
 
     .search-input {
       width: 100%;
-      background-color: var(--color-surface);
+      background-color: var(--color-surface-card);
       border: 1px solid var(--color-border);
       border-radius: 6px;
       padding: 8px 12px;
-      color: var(--color-cream);
+      color: var(--color-white);
       font-size: 12px;
       outline: none;
+      transition: border-color 0.15s ease;
+    }
+
+    .search-input:focus {
+      border-color: #52525b;
+    }
+
+    .search-input::placeholder {
+      color: var(--color-text-dim);
     }
 
     /* styling message list */
@@ -611,7 +670,7 @@
     /* styling single message item card */
     .msg-item {
       padding: 14px;
-      border-bottom: 1px solid var(--color-border);
+      border-bottom: 1px solid var(--color-border-subtle);
       cursor: pointer;
       transition: background 0.15s ease;
       display: flex;
@@ -620,12 +679,12 @@
     }
 
     .msg-item:hover {
-      background-color: var(--color-surface);
+      background-color: var(--color-surface-hover);
     }
 
     .msg-item.active {
-      background-color: var(--color-surface-hover);
-      border-left: 3px solid var(--color-primary);
+      background-color: var(--color-surface-card);
+      border-left: 3px solid var(--color-white);
     }
 
     /* styling msg top row */
@@ -638,12 +697,12 @@
     .msg-sender {
       font-size: 13px;
       font-weight: 600;
-      color: var(--color-cream);
+      color: var(--color-white);
     }
 
     .msg-time {
       font-size: 11px;
-      color: var(--color-text-muted);
+      color: var(--color-text-dim);
     }
 
     /* styling msg snippet */
@@ -662,8 +721,9 @@
     }
 
     .tag-fb {
-      background-color: rgba(24, 119, 242, 0.15);
+      background-color: rgba(24, 119, 242, 0.12);
       color: #60a5fa;
+      border: 1px solid rgba(24, 119, 242, 0.25);
       padding: 2px 6px;
       border-radius: 4px;
       font-size: 10px;
@@ -671,8 +731,9 @@
     }
 
     .tag-ig {
-      background-color: rgba(225, 48, 108, 0.15);
+      background-color: rgba(225, 48, 108, 0.12);
       color: #f472b6;
+      border: 1px solid rgba(225, 48, 108, 0.25);
       padding: 2px 6px;
       border-radius: 4px;
       font-size: 10px;
@@ -684,7 +745,7 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      background-color: #241C19;
+      background-color: var(--color-bg);
     }
 
     /* styling active conversation header */
@@ -718,27 +779,29 @@
     .bubble {
       max-width: 70%;
       padding: 10px 14px;
-      border-radius: 12px;
+      border-radius: 10px;
       font-size: 13px;
-      line-height: 1.4;
+      line-height: 1.5;
     }
 
     .bubble-inbound {
       background-color: var(--color-surface);
+      border: 1px solid var(--color-border);
       align-self: flex-start;
       border-bottom-left-radius: 2px;
-      color: var(--color-cream);
+      color: var(--color-text-main);
     }
 
     .bubble-read-only-banner {
-      background-color: rgba(240, 152, 47, 0.1);
-      border: 1px dashed var(--color-warning);
-      color: var(--color-warning);
-      padding: 10px;
+      background-color: rgba(245, 158, 11, 0.08);
+      border: 1px dashed rgba(245, 158, 11, 0.4);
+      color: #fbbf24;
+      padding: 12px;
       border-radius: 6px;
       font-size: 12px;
       text-align: center;
       margin-top: auto;
+      line-height: 1.4;
     }
 
     /* styling side widget column */
@@ -749,12 +812,12 @@
       display: flex;
       flex-direction: column;
       gap: 16px;
-      background-color: #1A1513;
+      background-color: var(--color-surface);
     }
 
     /* styling widget card container */
     .widget-card {
-      background-color: var(--color-surface);
+      background-color: var(--color-surface-card);
       border: 1px solid var(--color-border);
       border-radius: 8px;
       padding: 14px;
@@ -767,7 +830,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      color: var(--color-cream);
+      color: var(--color-white);
     }
 
     /* styling metric number row */
@@ -775,22 +838,38 @@
       display: flex;
       justify-content: space-between;
       font-size: 12px;
-      padding: 4px 0;
+      padding: 5px 0;
+      border-bottom: 1px solid var(--color-border-subtle);
+      color: var(--color-text-muted);
+    }
+
+    .stat-row:last-child {
+      border-bottom: none;
     }
 
     .stat-number {
-      font-weight: 700;
-      color: var(--color-primary-light);
+      font-weight: 600;
+      color: var(--color-white);
     }
 
     /* styling ai strategy widget card */
     .ai-card {
-      border-color: rgba(212, 121, 27, 0.4);
-      background: linear-gradient(180deg, rgba(212, 121, 27, 0.08) 0%, rgba(47, 42, 41, 1) 100%);
+      border: 1px solid #3f3f46;
+      background: linear-gradient(180deg, #1f1f23 0%, #141417 100%);
     }
 
     .ai-card h4 {
-      color: var(--color-ai-text);
+      color: var(--color-white);
+    }
+
+    .ai-badge {
+      font-size: 10px;
+      padding: 1px 6px;
+      border-radius: 4px;
+      background-color: rgba(168, 85, 247, 0.15);
+      color: #c084fc;
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      font-weight: 600;
     }
 
     /* ======== ANNOTATION VIEW STYLES ======= */
@@ -803,11 +882,11 @@
     }
 
     .specs-title {
-      font-family: var(--font-brand);
-      font-size: 28px;
-      font-weight: 400;
+      font-size: 24px;
+      font-weight: 700;
       margin-bottom: 16px;
-      color: var(--color-primary);
+      color: var(--color-white);
+      letter-spacing: -0.02em;
     }
 
     .specs-section {
@@ -819,10 +898,10 @@
     }
 
     .specs-section h3 {
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 600;
       margin-bottom: 12px;
-      color: var(--color-cream);
+      color: var(--color-white);
     }
 
     .specs-table {
@@ -839,8 +918,23 @@
     }
 
     .specs-table th {
-      background-color: var(--color-surface-hover);
-      color: var(--color-cream);
+      background-color: var(--color-surface-card);
+      color: var(--color-white);
+      font-weight: 600;
+    }
+
+    .specs-table td {
+      color: var(--color-text-muted);
+    }
+
+    .specs-table code {
+      background-color: var(--color-surface-card);
+      padding: 2px 6px;
+      border-radius: 4px;
+      border: 1px solid var(--color-border);
+      color: var(--color-text-main);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
     }
   </style>
 </head>
@@ -854,7 +948,7 @@
   <div class="wireframe-bar">
     <!-- showing project name tag -->
     <div class="wireframe-title">
-      <strong>MEERKAT WIREFRAME</strong>
+      <span>MEERKAT WIREFRAME</span>
       <span class="wireframe-badge">Phase 6 UI Specs</span>
     </div>
 
@@ -918,7 +1012,7 @@
           </div>
 
           <!-- footer copyright notice -->
-          <div style="font-size: 12px; color: var(--color-text-muted);">
+          <div style="font-size: 12px; color: var(--color-text-dim);">
             © 2026 Meerkat App. All rights reserved.
           </div>
         </div>
@@ -943,7 +1037,7 @@
             <!-- permissions information box -->
             <div class="login-info-box">
               <div class="login-info-title">🔒 Permissions Granted Upon Login:</div>
-              <ul style="margin-left: 16px; margin-top: 6px;">
+              <ul style="margin-left: 16px; margin-top: 6px; display: flex; flex-direction: column; gap: 4px;">
                 <li>Facebook Pages list & messaging permissions</li>
                 <li>Linked Instagram Business messaging</li>
                 <li>Page insights & analytics reading</li>
@@ -964,7 +1058,7 @@
           <!-- top brand header -->
           <div>
             <div class="sidebar-brand">
-              <div class="brand-icon" style="width: 28px; height: 28px; font-size: 14px;">M</div>
+              <div class="brand-icon" style="width: 28px; height: 28px; font-size: 13px;">M</div>
               <span>Meerkat</span>
             </div>
 
@@ -991,7 +1085,7 @@
             <div class="connected-pages-card">
               <div class="connected-pages-title">
                 <span>Connected Channels</span>
-                <span style="color: var(--color-success);">● Live</span>
+                <span class="live-indicator"><span class="live-dot"></span>Live</span>
               </div>
               <!-- facebook page -->
               <div class="page-row">
@@ -1089,9 +1183,9 @@
               <!-- active conversation top header -->
               <div class="chat-header">
                 <div class="chat-user-details">
-                  <div class="avatar" style="background-color: var(--color-fb);">M</div>
+                  <div class="avatar" style="background-color: var(--color-fb); border: none;">M</div>
                   <div>
-                    <strong style="font-size: 14px;">Maria Santos</strong>
+                    <strong style="font-size: 14px; color: var(--color-white);">Maria Santos</strong>
                     <div style="font-size: 11px; color: var(--color-text-muted);">via Facebook Page: Manila Craft Shop</div>
                   </div>
                 </div>
@@ -1116,7 +1210,7 @@
               <div class="widget-card">
                 <h4>
                   <span>Sales Overview</span>
-                  <span style="font-size: 10px; color: var(--color-text-muted);">Phase 8</span>
+                  <span style="font-size: 10px; color: var(--color-text-dim); border: 1px solid var(--color-border); padding: 1px 5px; border-radius: 4px;">Phase 8</span>
                 </h4>
                 <div class="stat-row">
                   <span>Weekly Reach</span>
@@ -1136,12 +1230,12 @@
               <div class="widget-card ai-card">
                 <h4>
                   <span>AI Strategy Tip</span>
-                  <span style="font-size: 10px; color: var(--color-ai-text);">Phase 9</span>
+                  <span class="ai-badge">Phase 9</span>
                 </h4>
-                <p style="font-size: 12px; line-height: 1.5; color: var(--color-cream); margin-top: 6px;">
+                <p style="font-size: 12px; line-height: 1.5; color: var(--color-text-main); margin-top: 8px;">
                   "Your Tuesday posts generate 3x more inquiries than weekends. Schedule your next leather wallet drop for Tuesday at 7:00 PM!"
                 </p>
-                <div style="font-size: 10px; color: var(--color-text-muted); margin-top: 8px;">
+                <div style="font-size: 10px; color: var(--color-text-dim); margin-top: 10px;">
                   Powered by BYOK LLM Key (Gemini / OpenAI)
                 </div>
               </div>
@@ -1208,11 +1302,12 @@
         <!-- section 2: design goals -->
         <div class="specs-section">
           <h3>Design & UX Decisions</h3>
-          <ul style="margin-left: 20px; line-height: 1.6; font-size: 13px;">
-            <li><strong>Single OAuth Flow:</strong> Login with Facebook for Business covers both FB Page & connected IG Business account.</li>
-            <li><strong>Platform Tags:</strong> High-visibility badges differentiate Facebook vs Instagram inquiries instantly.</li>
-            <li><strong>Read-Only Banner:</strong> Clear warning during Phase 6 that replies must be sent via Meta Business Suite until Phase 10+.</li>
-            <li><strong>Widget Placeholders:</strong> Prepared UI grid slots for Phase 8 Sales Analytics & Phase 9 AI Strategy.</li>
+          <ul style="margin-left: 20px; line-height: 1.6; font-size: 13px; color: var(--color-text-muted);">
+            <li><strong style="color: var(--color-white);">Minimalist Monochrome Theme:</strong> Clean black and white core design with neutral dark tones and standard functional accent tags.</li>
+            <li><strong style="color: var(--color-white);">Single OAuth Flow:</strong> Login with Facebook for Business covers both FB Page & connected IG Business account.</li>
+            <li><strong style="color: var(--color-white);">Platform Tags:</strong> High-visibility badges differentiate Facebook vs Instagram inquiries instantly.</li>
+            <li><strong style="color: var(--color-white);">Read-Only Banner:</strong> Clear warning during Phase 6 that replies must be sent via Meta Business Suite until Phase 10+.</li>
+            <li><strong style="color: var(--color-white);">Widget Placeholders:</strong> Prepared UI grid slots for Phase 8 Sales Analytics & Phase 9 AI Strategy.</li>
           </ul>
         </div>
       </div>

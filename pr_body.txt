@@ -1,27 +1,30 @@
 ## Type
-Feature / Fix
+Feature
 
 ## Summary
-Completes Phase 5 testing fixes and prepares the project for Render deployment. The Facebook Login flow was updated to correctly use Meta's new `config_id` required for Business Login and explicitly requests `pages_manage_metadata` to allow automated Webhook subscriptions. 
+Implements Phase 6 of the Dashboard UI featuring a minimalist Black & White theme built with Tailwind CSS v4, direct Facebook login redirection to the dashboard, and a customer messages endpoint.
 
 ## Changes
-- Updated `meerkat-backend/routes/auth.py` to use `config_id` instead of raw scopes.
-- Added logic in `auth.py` to auto-subscribe the seller's Facebook Pages to the webhook upon successful login.
-- Replaced hardcoded localhost URL in `meerkat-frontend/src/App.jsx` with `VITE_API_BASE_URL` environment variable.
-- Added `.env.example` to the frontend directory.
-- Updated `meerkat-backend/.env.example` to include `META_REDIRECT_URI`.
+- Updated `docs/wireframes/dashboard_login_wireframe.html` with a black and white color scheme and standard supporting accent colors.
+- Created `meerkat-frontend/src/DashboardView.jsx` containing the full 3-pane dashboard (sidebar navigation, live channels, message list with platform tags, detail view, read-only MVP banner, and sales/AI overview cards) styled using Tailwind CSS v4.
+- Updated `meerkat-frontend/src/App.jsx` to parse Facebook OAuth callback query parameters, persist seller session in `sessionStorage`, and seamlessly transition to the dashboard.
+- Updated `meerkat-backend/routes/auth.py` to redirect directly back to the frontend with seller query params upon successful Facebook Login.
+- Created `meerkat-backend/routes/messages.py` to retrieve and filter customer messages by platform.
+- Registered messages route in `meerkat-backend/main.py` and added automated test coverage in `meerkat-backend/test_main.py`.
 
 ## Related
-Phase 5 of Meta App Integration Plan
+Phase 6: Dashboard UI (Unified Inbox & Modern B&W Theme)
 
 ## Testing
 - [x] Tested locally
 - [x] No new errors/warnings in console
 - [x] Existing functionality still works (manual check)
-- [x] Webhook verified working against live Meta Graph API 
+- [x] Backend tests (`pytest`) passed with 100% success rate
+- [x] Backend linter (`ruff`) passed with 0 errors
+- [x] Frontend linter (`npm run lint`) and tests (`npm run test:run`) passed
 
 ## What might break
-Minimal risk. All endpoints updated safely.
+Low risk. All routes and components are backward compatible and properly tested.
 
 ## Screenshots (if UI change)
 N/A

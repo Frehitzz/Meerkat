@@ -1,7 +1,8 @@
 import os
+from urllib.parse import urlencode
 
 import httpx
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
@@ -34,18 +35,21 @@ def facebook_login():
 # ======== FACEBOOK LOGIN CALLBACK =======
 # link facebook sends code back to after seller approves
 @router.get("/facebook/callback")
-async def facebook_callback(code: str, db: Session = Depends(database.get_db)):
+async def facebook_callback(code: str = "", error: str = "", db: Session = Depends(database.get_db)):
+    # get frontend redirect base url from environment or default to local vite port
+    frontend_url = os.getenv("FRONTEND_URL", "http://localhost:5173")
+
+    # check if user cancelled or error occurred
+    if error or not code:
+        # redirect back to frontend with error flag
+        return RedirectResponse(url=f"{frontend_url}/?error=auth_failed")
+
     # get app id from environment
     app_id = os.getenv("META_APP_ID", "")
     # get app secret from environment
     app_secret = os.getenv("META_APP_SECRET", "")
     # set the callback link used during login
     redirect_uri = os.getenv("META_REDIRECT_URI", "http://localhost:8000/api/auth/facebook/callback")
-
-    # check if code was received
-    if not code:
-        # raise error if code is missing
-        raise HTTPException(status_code=400, detail="Authorization code missing")
 
     # open http client to talk to facebook graph api
     async with httpx.AsyncClient() as client:
@@ -61,9 +65,9 @@ async def facebook_callback(code: str, db: Session = Depends(database.get_db)):
         response = await client.get(token_url, params=params)
         # check if facebook token request failed
         if response.status_code != 200:
-            # raise error with details from facebook
-            raise HTTPException(status_code=400, detail=f"Token exchange failed: {response.text}")
-        
+            # redirect to frontend with token error
+            return RedirectResponse(url=f"{frontend_url}/?error=token_exchange_failed")
+
         # parse json reply from facebook
         token_data = response.json()
         # get access token string
@@ -75,7 +79,7 @@ async def facebook_callback(code: str, db: Session = Depends(database.get_db)):
         me_response = await client.get(me_url)
         # parse json profile reply
         profile_data = me_response.json()
-        
+
         # get facebook user id
         fb_user_id = profile_data.get("id", "unknown_id")
         # get seller name
@@ -131,13 +135,13 @@ async def facebook_callback(code: str, db: Session = Depends(database.get_db)):
     # refresh seller object from database
     db.refresh(seller)
 
-    # return success message with seller details
-    return {
-        "status": "success",
-        "message": "Facebook Login successful",
-        "seller": {
-            "id": seller.id,
-            "facebook_user_id": seller.facebook_user_id,
-            "name": seller.name,
-        },
-    }
+    # build query parameters to pass seller info back to frontend dashboard
+    query_params = urlencode({
+        "auth": "success",
+        "seller_id": seller.id,
+        "seller_name": seller.name,
+        "fb_user_id": seller.facebook_user_id,
+    })
+
+    # redirect seller browser back to frontend dashboard page
+    return RedirectResponse(url=f"{frontend_url}/?{query_params}")
