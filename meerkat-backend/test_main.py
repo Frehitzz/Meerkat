@@ -246,3 +246,68 @@ def test_get_messages_endpoint():
     assert res_ig.status_code == 200
     data_ig = res_ig.json()
     assert all(m["platform"] == "instagram" for m in data_ig["messages"])
+
+# test getting all messages with sorting and field verification
+def test_get_all_messages_for_seller():
+    # create tables in test database
+    models.database.Base.metadata.create_all(bind=engine)
+    # open session
+    db = TestingSessionLocal()
+    # clear existing messages to have a clean count
+    db.query(models.Message).delete()
+    db.commit()
+
+    # insert sample messages across platforms
+    m1 = models.Message(
+        platform=models.Platform.FACEBOOK,
+        sender_id="fb_user_101",
+        recipient_id="page_target",
+        message_text="First message from FB",
+    )
+    m2 = models.Message(
+        platform=models.Platform.INSTAGRAM,
+        sender_id="ig_user_202",
+        recipient_id="page_target",
+        message_text="Second message from IG",
+    )
+    m3 = models.Message(
+        platform=models.Platform.FACEBOOK,
+        sender_id="fb_user_303",
+        recipient_id="page_other",
+        message_text="Third message from FB other page",
+    )
+    # add messages to database
+    db.add_all([m1, m2, m3])
+    db.commit()
+    db.close()
+
+    # request all messages from endpoint
+    response = client.get("/api/messages")
+    # verify response status is 200
+    assert response.status_code == 200
+    data = response.json()
+    # verify response status is success
+    assert data["status"] == "success"
+    # verify count matches all inserted messages
+    assert data["count"] == 3
+    assert len(data["messages"]) == 3
+
+    # verify all required fields exist on every message
+    for msg in data["messages"]:
+        assert "id" in msg
+        assert "platform" in msg
+        assert "sender_id" in msg
+        assert "recipient_id" in msg
+        assert "message_text" in msg
+        assert "created_at" in msg
+
+    # verify filtering with platform=all returns all messages
+    res_all_filter = client.get("/api/messages?platform=all")
+    assert res_all_filter.status_code == 200
+    assert res_all_filter.json()["count"] == 3
+
+    # verify filtering by specific recipient page
+    res_recipient = client.get("/api/messages?recipient_id=page_target")
+    assert res_recipient.status_code == 200
+    assert res_recipient.json()["count"] == 2
+
