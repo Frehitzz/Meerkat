@@ -32,6 +32,7 @@ function DashboardView({ seller, onLogout }) {
         ? `${apiBaseUrl}/api/messages`
         : `${apiBaseUrl}/api/messages?platform=${platformFilter}`;
 
+
     // execute fetch request
     fetch(url)
       .then((res) => {
@@ -43,9 +44,10 @@ function DashboardView({ seller, onLogout }) {
         // set messages array
         const fetchedMessages = data.messages || [];
         setMessagesList(fetchedMessages);
-        // default select first message if none selected
+        // default select first conversation key if none selected
         if (fetchedMessages.length > 0) {
-          setSelectedChatId((prev) => prev || fetchedMessages[0].id);
+          const firstKey = `${fetchedMessages[0].platform}_${fetchedMessages[0].sender_id}`;
+          setSelectedChatId((prev) => prev || firstKey);
         }
       })
       .catch((err) => {
@@ -68,7 +70,14 @@ function DashboardView({ seller, onLogout }) {
       platform: "facebook",
       channelName: "Manila Craft Shop",
       time: "10:42 AM",
-      message_text: "Hi! Available pa ba itong leather wallet?",
+      snippet: "Hi! Available pa ba itong leather wallet?",
+      messages: [
+        {
+          id: "101",
+          text: "Hi! Available pa ba itong leather wallet? Magkano po pag custom initials?",
+          time: "10:42 AM",
+        },
+      ],
     },
     {
       id: "demo-2",
@@ -76,7 +85,14 @@ function DashboardView({ seller, onLogout }) {
       platform: "instagram",
       channelName: "@manilacrafts",
       time: "9:15 AM",
-      message_text: "How much is the shipping fee to Cebu?",
+      snippet: "How much is the shipping fee to Cebu?",
+      messages: [
+        {
+          id: "201",
+          text: "How much is the shipping fee to Cebu for 2 sets?",
+          time: "9:15 AM",
+        },
+      ],
     },
     {
       id: "demo-3",
@@ -84,28 +100,82 @@ function DashboardView({ seller, onLogout }) {
       platform: "facebook",
       channelName: "Manila Craft Shop",
       time: "Yesterday",
-      message_text: "Thank you! Received the items safely.",
+      snippet: "Thank you! Received the items safely.",
+      messages: [
+        {
+          id: "301",
+          text: "Thank you! Received the items safely. Excellent quality! ⭐⭐⭐⭐⭐",
+          time: "Yesterday 4:20 PM",
+        },
+      ],
     },
   ];
 
-  // use real messages if available, otherwise display fallback demo messages
-  const displayMessages =
-    messagesList.length > 0 ? messagesList : fallbackConversations;
+  // ======== GROUP MESSAGES INTO CONVERSATIONS =======
+  // group raw messages into unique customer conversation threads
+  const conversations = (() => {
+    // return fallback demo conversations if no real messages
+    if (!messagesList || messagesList.length === 0) {
+      return fallbackConversations;
+    }
 
-  // filter messages by search query string
-  const filteredConversations = displayMessages.filter((chat) => {
-    // check search match against sender id or message text
+    // map to group messages by conversation key
+    const groupMap = new Map();
+
+    // loop through all messages from backend
+    messagesList.forEach((msg) => {
+      // create conversation key by platform and sender id
+      const convKey = `${msg.platform}_${msg.sender_id}`;
+
+      // check if conversation is already in map
+      if (!groupMap.has(convKey)) {
+        // create new conversation entry
+        groupMap.set(convKey, {
+          id: convKey,
+          sender_id: msg.sender_id,
+          platform: msg.platform,
+          recipient_id: msg.recipient_id,
+          created_at: msg.created_at,
+          snippet: msg.message_text,
+          messages: [],
+        });
+      }
+
+      // add message to conversation thread
+      groupMap.get(convKey).messages.push(msg);
+    });
+
+    // convert map to array and sort messages inside conversation oldest first
+    return Array.from(groupMap.values()).map((conv) => {
+      // sort messages chronologically so chat reads top to bottom
+      const sortedMessages = [...conv.messages].sort((a, b) => {
+        const timeA = new Date(a.created_at || 0).getTime();
+        const timeB = new Date(b.created_at || 0).getTime();
+        return timeA - timeB;
+      });
+
+      return {
+        ...conv,
+        messages: sortedMessages,
+      };
+    });
+  })();
+
+  // filter conversations by search query string
+  const filteredConversations = conversations.filter((chat) => {
+    // check search match against sender id or message text inside conversation
     const sender = chat.sender_id || "";
-    const text = chat.message_text || "";
-    return (
-      sender.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      text.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesSender = sender.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesMessages = (chat.messages || []).some((m) =>
+      (m.message_text || m.text || "").toLowerCase().includes(searchQuery.toLowerCase())
     );
+    return matchesSender || matchesMessages;
   });
 
-  // get currently active selected message object
+  // get currently active selected conversation object
   const activeChat =
-    displayMessages.find((c) => c.id === selectedChatId) || displayMessages[0];
+    conversations.find((c) => c.id === selectedChatId) || conversations[0];
+
 
   // render dashboard interface
   return (
@@ -349,7 +419,7 @@ function DashboardView({ seller, onLogout }) {
 
                     {/* snippet text */}
                     <p className="text-xs text-[#a1a1aa] truncate">
-                      {chat.message_text}
+                      {chat.snippet || chat.message_text}
                     </p>
 
                     {/* platform badge */}
@@ -397,11 +467,28 @@ function DashboardView({ seller, onLogout }) {
 
             {/* chat message body */}
             <div className="flex-1 p-5 overflow-y-auto flex flex-col gap-3">
-              {activeChat && (
+              {activeChat?.messages && activeChat.messages.length > 0 ? (
+                activeChat.messages.map((msg) => (
+                  <div
+                    key={msg.id}
+                    className="max-w-[75%] p-3.5 rounded-xl text-[13px] leading-relaxed bg-[#141417] border border-[#27272a] text-[#f4f4f5] self-start rounded-bl-sm flex flex-col gap-1"
+                  >
+                    <span>{msg.message_text || msg.text}</span>
+                    <span className="text-[10px] text-[#71717a] self-end">
+                      {msg.created_at
+                        ? new Date(msg.created_at).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })
+                        : msg.time || ""}
+                    </span>
+                  </div>
+                ))
+              ) : activeChat?.message_text ? (
                 <div className="max-w-[75%] p-3.5 rounded-xl text-[13px] leading-relaxed bg-[#141417] border border-[#27272a] text-[#f4f4f5] self-start rounded-bl-sm">
                   {activeChat.message_text}
                 </div>
-              )}
+              ) : null}
 
               {/* read-only MVP notice banner */}
               <div className="mt-auto bg-[#f59e0b]/10 border border-dashed border-[#f59e0b]/40 text-[#fbbf24] p-3.5 rounded-lg text-xs text-center leading-relaxed">
@@ -437,10 +524,11 @@ function DashboardView({ seller, onLogout }) {
                 </div>
                 <div className="flex justify-between py-1.5 text-[#a1a1aa]">
                   <span>Conversations</span>
-                  <span className="font-semibold text-white">{messagesList.length || 24}</span>
+                  <span className="font-semibold text-white">{conversations.length || 24}</span>
                 </div>
               </div>
             </div>
+
 
             {/* ai strategy tip widget card */}
             <div className="bg-gradient-to-b from-[#1f1f23] to-[#141417] border border-[#3f3f46] rounded-lg p-3.5">
