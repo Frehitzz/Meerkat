@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // ======== DASHBOARD VIEW COMPONENT =======
 // main dashboard layout view after facebook login
@@ -10,79 +10,102 @@ function DashboardView({ seller, onLogout }) {
   // set search query string state
   const [searchQuery, setSearchQuery] = useState("");
   // set active conversation selection state
-  const [selectedChatId, setSelectedChatId] = useState(1);
+  const [selectedChatId, setSelectedChatId] = useState(null);
+  // set state for real messages from backend
+  const [messagesList, setMessagesList] = useState([]);
+  // set loading state for message fetching
+  const [isLoading, setIsLoading] = useState(false);
 
-  // sample conversations data matching wireframe specifications
-  const conversations = [
+  // base backend url from environment
+  const apiBaseUrl =
+    import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+
+  // ======== FETCH MESSAGES FROM BACKEND =======
+  // fetch real ingested customer messages from backend endpoint
+  useEffect(() => {
+    // track whether effect is active to prevent state update on unmounted component
+    let isMounted = true;
+
+    // build query url with platform filter
+    const url =
+      platformFilter === "all"
+        ? `${apiBaseUrl}/api/messages`
+        : `${apiBaseUrl}/api/messages?platform=${platformFilter}`;
+
+    // execute fetch request
+    fetch(url)
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch messages");
+        return res.json();
+      })
+      .then((data) => {
+        if (!isMounted) return;
+        // set messages array
+        const fetchedMessages = data.messages || [];
+        setMessagesList(fetchedMessages);
+        // default select first message if none selected
+        if (fetchedMessages.length > 0) {
+          setSelectedChatId((prev) => prev || fetchedMessages[0].id);
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching messages:", err);
+      })
+      .finally(() => {
+        if (isMounted) setIsLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [platformFilter, apiBaseUrl]);
+
+  // fallback sample conversations if no real messages exist in database yet
+  const fallbackConversations = [
     {
-      id: 1,
-      sender: "Maria Santos",
+      id: "demo-1",
+      sender_id: "demo_user_1",
       platform: "facebook",
-      avatarText: "M",
       channelName: "Manila Craft Shop",
       time: "10:42 AM",
-      snippet: "Hi! Available pa ba itong leather wallet?",
-      messages: [
-        {
-          id: 101,
-          text: "Hi! Available pa ba itong leather wallet? Magkano po pag custom initials?",
-          isInbound: true,
-          time: "10:42 AM",
-        },
-      ],
+      message_text: "Hi! Available pa ba itong leather wallet?",
     },
     {
-      id: 2,
-      sender: "@juan_delacruz",
+      id: "demo-2",
+      sender_id: "demo_user_2",
       platform: "instagram",
-      avatarText: "J",
       channelName: "@manilacrafts",
       time: "9:15 AM",
-      snippet: "How much is the shipping fee to Cebu?",
-      messages: [
-        {
-          id: 201,
-          text: "How much is the shipping fee to Cebu for 2 sets?",
-          isInbound: true,
-          time: "9:15 AM",
-        },
-      ],
+      message_text: "How much is the shipping fee to Cebu?",
     },
     {
-      id: 3,
-      sender: "Elena Reyes",
+      id: "demo-3",
+      sender_id: "demo_user_3",
       platform: "facebook",
-      avatarText: "E",
       channelName: "Manila Craft Shop",
       time: "Yesterday",
-      snippet: "Thank you! Received the items safely.",
-      messages: [
-        {
-          id: 301,
-          text: "Thank you! Received the items safely. Excellent quality! ⭐⭐⭐⭐⭐",
-          isInbound: true,
-          time: "Yesterday 4:20 PM",
-        },
-      ],
+      message_text: "Thank you! Received the items safely.",
     },
   ];
 
-  // filter conversations by platform and search query
-  const filteredConversations = conversations.filter((chat) => {
-    // check platform match
-    const matchesPlatform =
-      platformFilter === "all" || chat.platform === platformFilter;
-    // check search match against sender name or snippet
-    const matchesSearch =
-      chat.sender.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      chat.snippet.toLowerCase().includes(searchQuery.toLowerCase());
-    // return combined filter result
-    return matchesPlatform && matchesSearch;
+  // use real messages if available, otherwise display fallback demo messages
+  const displayMessages =
+    messagesList.length > 0 ? messagesList : fallbackConversations;
+
+  // filter messages by search query string
+  const filteredConversations = displayMessages.filter((chat) => {
+    // check search match against sender id or message text
+    const sender = chat.sender_id || "";
+    const text = chat.message_text || "";
+    return (
+      sender.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      text.toLowerCase().includes(searchQuery.toLowerCase())
+    );
   });
 
-  // get currently selected active chat object
+  // get currently active selected message object
   const activeChat =
-    conversations.find((c) => c.id === selectedChatId) || conversations[0];
+    displayMessages.find((c) => c.id === selectedChatId) || displayMessages[0];
 
   // render dashboard interface
   return (
@@ -290,9 +313,13 @@ function DashboardView({ seller, onLogout }) {
 
             {/* conversation items scroll area */}
             <div className="flex-1 overflow-y-auto">
-              {filteredConversations.length === 0 ? (
+              {isLoading ? (
                 <div className="p-6 text-center text-xs text-[#71717a]">
-                  No conversations found
+                  Loading messages...
+                </div>
+              ) : filteredConversations.length === 0 ? (
+                <div className="p-6 text-center text-xs text-[#71717a]">
+                  No messages found
                 </div>
               ) : (
                 filteredConversations.map((chat) => (
@@ -307,17 +334,22 @@ function DashboardView({ seller, onLogout }) {
                   >
                     {/* header row with sender and time */}
                     <div className="flex items-center justify-between">
-                      <span className="text-[13px] font-semibold text-white">
-                        {chat.sender}
+                      <span className="text-[13px] font-semibold text-white truncate max-w-[170px]">
+                        {chat.sender_id ? `User #${chat.sender_id.slice(-6)}` : "Customer"}
                       </span>
                       <span className="text-[11px] text-[#71717a]">
-                        {chat.time}
+                        {chat.created_at
+                          ? new Date(chat.created_at).toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })
+                          : chat.time || "Recent"}
                       </span>
                     </div>
 
                     {/* snippet text */}
                     <p className="text-xs text-[#a1a1aa] truncate">
-                      {chat.snippet}
+                      {chat.message_text}
                     </p>
 
                     {/* platform badge */}
@@ -345,20 +377,19 @@ function DashboardView({ seller, onLogout }) {
               <div className="flex items-center gap-3">
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white ${
-                    activeChat.platform === "facebook"
+                    activeChat?.platform === "facebook"
                       ? "bg-[#1877f2]"
                       : "bg-[#e1306c]"
                   }`}
                 >
-                  {activeChat.avatarText}
+                  {activeChat?.sender_id ? activeChat.sender_id.charAt(0).toUpperCase() : "C"}
                 </div>
                 <div className="flex flex-col">
                   <span className="text-sm font-semibold text-white">
-                    {activeChat.sender}
+                    {activeChat?.sender_id ? `User #${activeChat.sender_id}` : "Customer"}
                   </span>
                   <span className="text-[11px] text-[#a1a1aa]">
-                    via {activeChat.platform === "facebook" ? "Facebook Page" : "Instagram"}:{" "}
-                    {activeChat.channelName}
+                    via {activeChat?.platform === "facebook" ? "Facebook Page" : "Instagram"}
                   </span>
                 </div>
               </div>
@@ -366,14 +397,11 @@ function DashboardView({ seller, onLogout }) {
 
             {/* chat message body */}
             <div className="flex-1 p-5 overflow-y-auto flex flex-col gap-3">
-              {activeChat.messages.map((msg) => (
-                <div
-                  key={msg.id}
-                  className="max-w-[75%] p-3.5 rounded-xl text-[13px] leading-relaxed bg-[#141417] border border-[#27272a] text-[#f4f4f5] self-start rounded-bl-sm"
-                >
-                  {msg.text}
+              {activeChat && (
+                <div className="max-w-[75%] p-3.5 rounded-xl text-[13px] leading-relaxed bg-[#141417] border border-[#27272a] text-[#f4f4f5] self-start rounded-bl-sm">
+                  {activeChat.message_text}
                 </div>
-              ))}
+              )}
 
               {/* read-only MVP notice banner */}
               <div className="mt-auto bg-[#f59e0b]/10 border border-dashed border-[#f59e0b]/40 text-[#fbbf24] p-3.5 rounded-lg text-xs text-center leading-relaxed">
@@ -409,7 +437,7 @@ function DashboardView({ seller, onLogout }) {
                 </div>
                 <div className="flex justify-between py-1.5 text-[#a1a1aa]">
                   <span>Conversations</span>
-                  <span className="font-semibold text-white">24</span>
+                  <span className="font-semibold text-white">{messagesList.length || 24}</span>
                 </div>
               </div>
             </div>
