@@ -42,6 +42,8 @@ def get_messages(
                 "id": m.id,
                 "platform": m.platform.value if hasattr(m.platform, "value") else str(m.platform),
                 "sender_id": m.sender_id,
+                "sender_name": m.sender_name,
+                "sender_profile_pic": m.sender_profile_pic,
                 "recipient_id": m.recipient_id,
                 "message_text": m.message_text,
                 "created_at": m.created_at.isoformat() if m.created_at else None,
@@ -49,3 +51,4 @@ def get_messages(
             for m in messages
         ],
     }
+

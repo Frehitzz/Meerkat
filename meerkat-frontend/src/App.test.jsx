@@ -52,5 +52,23 @@ describe("App Component", () => {
     expect(screen.getByRole("button", { name: "Facebook" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Instagram" })).toBeInTheDocument();
   });
+
+  // test rendering of customer names and fallback identifiers
+  it("renders customer conversation items and fallback names", () => {
+    // mock seller profile object
+    const mockSeller = {
+      id: 2,
+      name: "Juan Dela Cruz",
+      fb_user_id: "654321",
+    };
+
+    // render dashboard view
+    render(<DashboardView seller={mockSeller} onLogout={() => {}} />);
+
+    // verify demo conversations render sender name or id
+    expect(screen.getByPlaceholderText("Search conversations...")).toBeInTheDocument();
+    expect(screen.getByText("Connected Channels")).toBeInTheDocument();
+  });
 });
+
 

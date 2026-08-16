@@ -59,9 +59,14 @@ class Message(database.Base):
     platform = Column(Enum(Platform), index=True)
     # store sender id from meta
     sender_id = Column(String, index=True)
+    # store customer real display name
+    sender_name = Column(String, nullable=True)
+    # store customer profile picture url
+    sender_profile_pic = Column(String, nullable=True)
     # store recipient page or account id
     recipient_id = Column(String, index=True)
     # store message text body
     message_text = Column(String)
     # save date and time message arrived
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+

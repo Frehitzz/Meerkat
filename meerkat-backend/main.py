@@ -1,5 +1,7 @@
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
 import database
@@ -10,6 +12,23 @@ from routes import auth, messages, webhooks
 # build the database tables if they are not there yet
 models.database.Base.metadata.create_all(bind=database.engine)
 
+# ensure newly added columns exist in existing tables
+def run_migrations():
+    try:
+        # execute alter table statements safely
+        with database.engine.connect() as conn:
+            conn.execute(text("ALTER TABLE messages ADD COLUMN IF NOT EXISTS sender_name VARCHAR;"))
+            conn.execute(text("ALTER TABLE messages ADD COLUMN IF NOT EXISTS sender_profile_pic VARCHAR;"))
+            conn.commit()
+    except SQLAlchemyError:
+        # ignore if database engine does not support alter column
+        return
+
+# run schema migrations on startup
+run_migrations()
+
+
+
 # ======== APP INITIALIZATION =======
 # start the main web app
 app = FastAPI()
@@ -19,12 +38,16 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:5174",
         "https://meerkat-app.onrender.com",
     ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 # ======== INCLUDE ROUTERS =======
 # connect auth router links to main app

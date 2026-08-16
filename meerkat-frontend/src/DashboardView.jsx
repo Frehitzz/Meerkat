@@ -133,12 +133,23 @@ function DashboardView({ seller, onLogout }) {
         groupMap.set(convKey, {
           id: convKey,
           sender_id: msg.sender_id,
+          sender_name: msg.sender_name,
+          sender_profile_pic: msg.sender_profile_pic,
           platform: msg.platform,
           recipient_id: msg.recipient_id,
           created_at: msg.created_at,
           snippet: msg.message_text,
           messages: [],
         });
+      } else {
+        // update name and profile pic if available on subsequent messages
+        const existing = groupMap.get(convKey);
+        if (!existing.sender_name && msg.sender_name) {
+          existing.sender_name = msg.sender_name;
+        }
+        if (!existing.sender_profile_pic && msg.sender_profile_pic) {
+          existing.sender_profile_pic = msg.sender_profile_pic;
+        }
       }
 
       // add message to conversation thread
@@ -163,18 +174,21 @@ function DashboardView({ seller, onLogout }) {
 
   // filter conversations by search query string
   const filteredConversations = conversations.filter((chat) => {
-    // check search match against sender id or message text inside conversation
+    // check search match against sender name, sender id, or message text inside conversation
+    const name = chat.sender_name || "";
     const sender = chat.sender_id || "";
+    const matchesName = name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesSender = sender.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesMessages = (chat.messages || []).some((m) =>
       (m.message_text || m.text || "").toLowerCase().includes(searchQuery.toLowerCase())
     );
-    return matchesSender || matchesMessages;
+    return matchesName || matchesSender || matchesMessages;
   });
 
   // get currently active selected conversation object
   const activeChat =
     conversations.find((c) => c.id === selectedChatId) || conversations[0];
+
 
 
   // render dashboard interface
@@ -405,7 +419,7 @@ function DashboardView({ seller, onLogout }) {
                     {/* header row with sender and time */}
                     <div className="flex items-center justify-between">
                       <span className="text-[13px] font-semibold text-white truncate max-w-[170px]">
-                        {chat.sender_id ? `User #${chat.sender_id.slice(-6)}` : "Customer"}
+                        {chat.sender_name || (chat.sender_id ? `User #${chat.sender_id.slice(-6)}` : "Customer")}
                       </span>
                       <span className="text-[11px] text-[#71717a]">
                         {chat.created_at
@@ -445,18 +459,28 @@ function DashboardView({ seller, onLogout }) {
             {/* active conversation top header */}
             <div className="h-[57px] px-5 border-b border-[#27272a] bg-[#141417] flex items-center justify-between shrink-0">
               <div className="flex items-center gap-3">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white ${
-                    activeChat?.platform === "facebook"
-                      ? "bg-[#1877f2]"
-                      : "bg-[#e1306c]"
-                  }`}
-                >
-                  {activeChat?.sender_id ? activeChat.sender_id.charAt(0).toUpperCase() : "C"}
-                </div>
+                {activeChat?.sender_profile_pic ? (
+                  <img
+                    src={activeChat.sender_profile_pic}
+                    alt="Avatar"
+                    className="w-8 h-8 rounded-full object-cover border border-[#27272a]"
+                  />
+                ) : (
+                  <div
+                    className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white ${
+                      activeChat?.platform === "facebook"
+                        ? "bg-[#1877f2]"
+                        : "bg-[#e1306c]"
+                    }`}
+                  >
+                    {activeChat?.sender_name
+                      ? activeChat.sender_name.charAt(0).toUpperCase()
+                      : activeChat?.sender_id ? activeChat.sender_id.charAt(0).toUpperCase() : "C"}
+                  </div>
+                )}
                 <div className="flex flex-col">
                   <span className="text-sm font-semibold text-white">
-                    {activeChat?.sender_id ? `User #${activeChat.sender_id}` : "Customer"}
+                    {activeChat?.sender_name || (activeChat?.sender_id ? `User #${activeChat.sender_id}` : "Customer")}
                   </span>
                   <span className="text-[11px] text-[#a1a1aa]">
                     via {activeChat?.platform === "facebook" ? "Facebook Page" : "Instagram"}
@@ -464,6 +488,7 @@ function DashboardView({ seller, onLogout }) {
                 </div>
               </div>
             </div>
+
 
             {/* chat message body */}
             <div className="flex-1 p-5 overflow-y-auto flex flex-col gap-3">

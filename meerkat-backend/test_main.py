@@ -297,6 +297,8 @@ def test_get_all_messages_for_seller():
         assert "id" in msg
         assert "platform" in msg
         assert "sender_id" in msg
+        assert "sender_name" in msg
+        assert "sender_profile_pic" in msg
         assert "recipient_id" in msg
         assert "message_text" in msg
         assert "created_at" in msg
@@ -310,4 +312,68 @@ def test_get_all_messages_for_seller():
     res_recipient = client.get("/api/messages?recipient_id=page_target")
     assert res_recipient.status_code == 200
     assert res_recipient.json()["count"] == 2
+
+# test customer profile resolution and caching during webhook ingestion
+def test_webhook_customer_profile_resolution(monkeypatch):
+    # create tables in test database
+    models.database.Base.metadata.create_all(bind=engine)
+    # open database session
+    db = TestingSessionLocal()
+    # clear existing messages
+    db.query(models.Message).delete()
+    db.commit()
+
+    # insert sample seller with encrypted access token
+    import security
+    encrypted_tok = security.encrypt_token("EAAB_test_page_token")
+    seller = models.Seller(
+        facebook_user_id="seller_fb_123",
+        name="Shop Owner",
+        encrypted_access_token=encrypted_tok,
+    )
+    db.add(seller)
+    db.commit()
+    db.close()
+
+    # mock fetch_customer_profile helper
+    from routes import webhooks
+    async def mock_fetch_customer_profile(sender_psid, recipient_page_id, access_token):
+        return {
+            "name": "Maria Santos",
+            "profile_pic": "https://example.com/maria.jpg",
+        }
+
+    monkeypatch.setattr(webhooks, "fetch_customer_profile", mock_fetch_customer_profile)
+
+
+    # simulate incoming facebook webhook payload
+    payload = {
+        "object": "page",
+        "entry": [
+            {
+                "id": "page_456",
+                "messaging": [
+                    {
+                        "sender": {"id": "user_maria_99"},
+                        "recipient": {"id": "page_456"},
+                        "message": {"text": "Hello, how much is the bag?"},
+                    }
+                ],
+            }
+        ],
+    }
+
+    # send webhook request
+    res = client.post("/api/webhook", json=payload)
+    assert res.status_code == 200
+
+    # open session to verify saved message with resolved customer name
+    db = TestingSessionLocal()
+    saved = db.query(models.Message).filter_by(sender_id="user_maria_99").first()
+    assert saved is not None
+    assert saved.sender_name == "Maria Santos"
+    assert saved.sender_profile_pic == "https://example.com/maria.jpg"
+    assert saved.message_text == "Hello, how much is the bag?"
+    db.close()
+
 
