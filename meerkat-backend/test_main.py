@@ -209,6 +209,15 @@ def test_get_messages_endpoint():
     models.database.Base.metadata.create_all(bind=engine)
     # open session
     db = TestingSessionLocal()
+    db.query(models.Seller).delete()
+    seller = models.Seller(
+        facebook_user_id="seller_msg_endpoint_test",
+        name="Test Seller Msg",
+    )
+    db.add(seller)
+    db.commit()
+    db.refresh(seller)
+
     # insert sample facebook message
     msg_fb = models.Message(
         platform=models.Platform.FACEBOOK,
@@ -226,26 +235,31 @@ def test_get_messages_endpoint():
     db.add(msg_fb)
     db.add(msg_ig)
     db.commit()
+
+    import security
+    token = security.create_access_token(seller.id)
+    headers = {"Authorization": f"Bearer {token}"}
     db.close()
 
     # get all messages
-    res_all = client.get("/api/messages")
+    res_all = client.get("/api/messages", headers=headers)
     assert res_all.status_code == 200
     data_all = res_all.json()
     assert data_all["status"] == "success"
     assert data_all["count"] >= 2
 
     # get filtered facebook messages
-    res_fb = client.get("/api/messages?platform=facebook")
+    res_fb = client.get("/api/messages?platform=facebook", headers=headers)
     assert res_fb.status_code == 200
     data_fb = res_fb.json()
     assert all(m["platform"] == "facebook" for m in data_fb["messages"])
 
     # get filtered instagram messages
-    res_ig = client.get("/api/messages?platform=instagram")
+    res_ig = client.get("/api/messages?platform=instagram", headers=headers)
     assert res_ig.status_code == 200
     data_ig = res_ig.json()
     assert all(m["platform"] == "instagram" for m in data_ig["messages"])
+
 
 # test getting all messages with sorting and field verification
 def test_get_all_messages_for_seller():
@@ -255,7 +269,17 @@ def test_get_all_messages_for_seller():
     db = TestingSessionLocal()
     # clear existing messages to have a clean count
     db.query(models.Message).delete()
+    db.query(models.Seller).delete()
     db.commit()
+
+    # insert sample seller
+    seller = models.Seller(
+        facebook_user_id="seller_msg_test",
+        name="Test Seller",
+    )
+    db.add(seller)
+    db.commit()
+    db.refresh(seller)
 
     # insert sample messages across platforms
     m1 = models.Message(
@@ -279,10 +303,15 @@ def test_get_all_messages_for_seller():
     # add messages to database
     db.add_all([m1, m2, m3])
     db.commit()
+
+    # generate jwt token for seller
+    import security
+    token = security.create_access_token(seller.id)
+    headers = {"Authorization": f"Bearer {token}"}
     db.close()
 
-    # request all messages from endpoint
-    response = client.get("/api/messages")
+    # request all messages from endpoint with bearer auth
+    response = client.get("/api/messages", headers=headers)
     # verify response status is 200
     assert response.status_code == 200
     data = response.json()
@@ -304,14 +333,67 @@ def test_get_all_messages_for_seller():
         assert "created_at" in msg
 
     # verify filtering with platform=all returns all messages
-    res_all_filter = client.get("/api/messages?platform=all")
+    res_all_filter = client.get("/api/messages?platform=all", headers=headers)
     assert res_all_filter.status_code == 200
     assert res_all_filter.json()["count"] == 3
 
     # verify filtering by specific recipient page
-    res_recipient = client.get("/api/messages?recipient_id=page_target")
+    res_recipient = client.get("/api/messages?recipient_id=page_target", headers=headers)
     assert res_recipient.status_code == 200
     assert res_recipient.json()["count"] == 2
+
+# ======== AUTH & SESSION MIDDLEWARE TESTS =======
+# test creating and decoding jwt access token
+def test_access_token_creation_and_decoding():
+    import security
+    token = security.create_access_token(42)
+    assert token is not None
+    assert isinstance(token, str)
+    decoded_id = security.decode_access_token(token)
+    assert decoded_id == 42
+
+    # test decoding invalid token returns none
+    assert security.decode_access_token("invalid.jwt.token") is None
+
+# test get me endpoint with valid bearer token
+def test_get_me_endpoint_with_valid_token():
+    models.database.Base.metadata.create_all(bind=engine)
+    db = TestingSessionLocal()
+    db.query(models.Seller).delete()
+    seller = models.Seller(
+        facebook_user_id="seller_me_test",
+        name="Elena Ramos",
+    )
+    db.add(seller)
+    db.commit()
+    db.refresh(seller)
+
+    import security
+    token = security.create_access_token(seller.id)
+    db.close()
+
+    response = client.get("/api/auth/me", headers={"Authorization": f"Bearer {token}"})
+    assert response.status_code == 200
+    data = response.json()
+    assert data["id"] == seller.id
+    assert data["name"] == "Elena Ramos"
+    assert data["facebook_user_id"] == "seller_me_test"
+
+# test get me endpoint returns 401 when unauthorized
+def test_get_me_endpoint_unauthorized():
+    # request without auth header
+    response = client.get("/api/auth/me")
+    assert response.status_code == 401
+
+    # request with invalid bearer token
+    response_invalid = client.get("/api/auth/me", headers={"Authorization": "Bearer fake_token"})
+    assert response_invalid.status_code == 401
+
+# test messages endpoint requires auth
+def test_get_messages_unauthorized():
+    response = client.get("/api/messages")
+    assert response.status_code == 401
+
 
 # test customer profile resolution and caching during webhook ingestion
 def test_webhook_customer_profile_resolution(monkeypatch):
@@ -319,9 +401,11 @@ def test_webhook_customer_profile_resolution(monkeypatch):
     models.database.Base.metadata.create_all(bind=engine)
     # open database session
     db = TestingSessionLocal()
-    # clear existing messages
+    # clear existing messages and sellers
     db.query(models.Message).delete()
+    db.query(models.Seller).delete()
     db.commit()
+
 
     # insert sample seller with encrypted access token
     import security

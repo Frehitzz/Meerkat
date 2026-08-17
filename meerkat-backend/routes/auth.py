@@ -7,6 +7,7 @@ from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
 import database
+import dependencies
 import models
 import security
 
@@ -135,9 +136,13 @@ async def facebook_callback(code: str = "", error: str = "", db: Session = Depen
     # refresh seller object from database
     db.refresh(seller)
 
-    # build query parameters to pass seller info back to frontend dashboard
+    # create jwt session token for seller
+    session_token = security.create_access_token(seller.id)
+
+    # build query parameters to pass seller info and session token back to frontend
     query_params = urlencode({
         "auth": "success",
+        "token": session_token,
         "seller_id": seller.id,
         "seller_name": seller.name,
         "fb_user_id": seller.facebook_user_id,
@@ -145,3 +150,15 @@ async def facebook_callback(code: str = "", error: str = "", db: Session = Depen
 
     # redirect seller browser back to frontend dashboard page
     return RedirectResponse(url=f"{frontend_url}/?{query_params}")
+
+# ======== GET AUTHENTICATED SELLER PROFILE =======
+# link to get currently logged in seller profile
+@router.get("/me")
+def get_current_seller_profile(seller: models.Seller = Depends(dependencies.get_current_seller)):
+    # send back seller profile details
+    return {
+        "id": seller.id,
+        "name": seller.name,
+        "facebook_user_id": seller.facebook_user_id,
+    }
+

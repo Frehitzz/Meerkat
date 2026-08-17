@@ -32,10 +32,20 @@ function DashboardView({ seller, onLogout }) {
         ? `${apiBaseUrl}/api/messages`
         : `${apiBaseUrl}/api/messages?platform=${platformFilter}`;
 
+    // retrieve session auth token from browser storage
+    const token =
+      localStorage.getItem("meerkat_token") ||
+      sessionStorage.getItem("meerkat_token");
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
     // execute fetch request
-    fetch(url)
+    fetch(url, { headers })
       .then((res) => {
+        // check if token is invalid or expired
+        if (res.status === 401) {
+          if (onLogout) onLogout();
+          throw new Error("Unauthorized");
+        }
         if (!res.ok) throw new Error("Failed to fetch messages");
         return res.json();
       })
@@ -57,10 +67,12 @@ function DashboardView({ seller, onLogout }) {
         if (isMounted) setIsLoading(false);
       });
 
+
     return () => {
       isMounted = false;
     };
-  }, [platformFilter, apiBaseUrl]);
+  }, [platformFilter, apiBaseUrl, onLogout]);
+
 
   // fallback sample conversations if no real messages exist in database yet
   const fallbackConversations = [
