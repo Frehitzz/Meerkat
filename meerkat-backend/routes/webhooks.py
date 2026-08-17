@@ -131,6 +131,7 @@ async def receive_webhook(
 
     # parse body bytes into json object
     payload = await request.json()
+    is_instagram = payload.get("object") == "instagram"
 
     # check if payload contains entry list
     if "entry" in payload:
@@ -149,6 +150,7 @@ async def receive_webhook(
                 if "text" in message_obj:
                     sender_psid = sender.get("id", "")
                     recipient_page_id = recipient.get("id", "")
+                    platform_type = "instagram" if is_instagram else "facebook"
 
                     # check if customer name already exists in database
                     cached_msg = (
@@ -172,10 +174,9 @@ async def receive_webhook(
                             sender_name = profile.get("name")
                             sender_pic = profile.get("profile_pic")
 
-
                     # create new message record with resolved sender details
                     msg = models.Message(
-                        platform="facebook",
+                        platform=platform_type,
                         sender_id=sender_psid,
                         sender_name=sender_name,
                         sender_profile_pic=sender_pic,
@@ -184,6 +185,7 @@ async def receive_webhook(
                     )
                     # add message to database session
                     db.add(msg)
+
 
             # check for instagram dm changes events
             for change in entry.get("changes", []):

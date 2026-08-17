@@ -126,10 +126,14 @@ function DashboardView({ seller, onLogout }) {
   // ======== GROUP MESSAGES INTO CONVERSATIONS =======
   // group raw messages into unique customer conversation threads
   const conversations = (() => {
-    // return fallback demo conversations if no real messages
-    if (!messagesList || messagesList.length === 0) {
+    // return fallback demo conversations only if seller is in demo mode
+    if (seller?.id === "demo") {
       return fallbackConversations;
     }
+    if (!messagesList || messagesList.length === 0) {
+      return [];
+    }
+
 
     // map to group messages by conversation key
     const groupMap = new Map();
