@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 import database
+import dependencies
 import models
 
 # ======== ROUTER INITIALIZATION =======
@@ -13,12 +14,13 @@ router = APIRouter(prefix="/api/messages", tags=["messages"])
 @router.get("")
 def get_messages(
     platform: str | None = None,
-    seller_id: int | None = None,
     recipient_id: str | None = None,
     db: Session = Depends(database.get_db),
+    seller: models.Seller = Depends(dependencies.get_current_seller),
 ):
     # create base query on messages table
     query = db.query(models.Message)
+
 
     # filter by platform if provided and not equal to all
     if platform and platform != "all":

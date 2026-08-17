@@ -17,6 +17,7 @@ function getInitialSeller() {
 
   const params = new URLSearchParams(window.location.search);
   const authStatus = params.get("auth");
+  const token = params.get("token");
   const sellerId = params.get("seller_id");
   const sellerName = params.get("seller_name");
   const fbUserId = params.get("fb_user_id");
@@ -28,19 +29,27 @@ function getInitialSeller() {
       name: decodeURIComponent(sellerName),
       fb_user_id: fbUserId,
     };
-    // persist in session storage
+    // persist token and seller data in storage
+    if (token) {
+      localStorage.setItem("meerkat_token", token);
+      sessionStorage.setItem("meerkat_token", token);
+    }
+    localStorage.setItem("meerkat_seller", JSON.stringify(sellerData));
     sessionStorage.setItem("meerkat_seller", JSON.stringify(sellerData));
     // clean url query params
     window.history.replaceState({}, document.title, window.location.pathname);
     return sellerData;
   }
 
-  // check if seller is already cached in session storage
-  const stored = sessionStorage.getItem("meerkat_seller");
+  // check if seller is already cached in browser storage
+  const stored =
+    localStorage.getItem("meerkat_seller") ||
+    sessionStorage.getItem("meerkat_seller");
   if (stored) {
     try {
       return JSON.parse(stored);
     } catch {
+      localStorage.removeItem("meerkat_seller");
       sessionStorage.removeItem("meerkat_seller");
     }
   }
@@ -60,9 +69,13 @@ function App() {
   const handleLogout = () => {
     // clear seller state
     setSeller(null);
-    // remove session from browser storage
+    // remove token and session from browser storage
+    localStorage.removeItem("meerkat_token");
+    localStorage.removeItem("meerkat_seller");
+    sessionStorage.removeItem("meerkat_token");
     sessionStorage.removeItem("meerkat_seller");
   };
+
 
   // if seller is logged in, show dashboard view
   if (seller) {
